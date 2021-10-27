@@ -37,37 +37,6 @@ fun log(message: String) {
     Log.d("SocialGateway", message)
 }
 
-class SocialAppAdapter(
-    private val context: Context,
-    private val onClick: (Context, SocialApp) -> Unit
-) : BaseAdapter() {
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-        val socialApp = SocialApps[position]
-        val imageView = convertView as? ImageView ?: ImageView(context).apply {
-            // otherwise icons will be far from each other
-            adjustViewBounds = true
-        }
-
-        return imageView.apply {
-            setImageResource(socialApp.imageId)
-            setOnClickListener { onClick(context, socialApp) }
-        }
-    }
-
-    override fun getItem(position: Int): Any {
-        return SocialApps[position]
-    }
-
-    override fun getItemId(position: Int): Long {
-        // why toLong()?
-        return position.toLong()
-    }
-
-    override fun getCount(): Int {
-        return SocialApps.size
-    }
-}
-
 enum class IntentCategory { AskQuestion, Reflection, CheckIn }
 
 class MainActivity : AppCompatActivity() {
