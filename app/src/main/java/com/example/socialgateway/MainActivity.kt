@@ -31,6 +31,7 @@ import java.net.URLEncoder
 import java.util.*
 import java.util.Calendar.*
 
+// TODO find a better place for these
 const val channelId = "SocialGatewayChannelId"
 
 fun log(message: String) {
@@ -395,71 +396,5 @@ class MainActivity : AppCompatActivity() {
             putString("userId", userId)
             apply()
         }
-    }
-}
-
-val appWidgetIdToSocialApp = mutableMapOf<Int, SocialApp>()
-
-class MyAppWidgetProvider : AppWidgetProvider() {
-    override fun onUpdate(
-        context: Context,
-        appWidgetManager: AppWidgetManager,
-        appWidgetIds: IntArray
-    ) {
-        appWidgetIds.forEach { appWidgetId ->
-            updateAppWidget(context, appWidgetManager, appWidgetId)
-        }
-    }
-
-    companion object {
-        fun updateAppWidget(
-            context: Context,
-            appWidgetManager: AppWidgetManager,
-            appWidgetId: Int
-        ) {
-            val socialApp = appWidgetIdToSocialApp[appWidgetId] ?: return
-
-            val pendingIntent = Intent(context, MainActivity::class.java).let {
-                it.putExtra("intentCategory", IntentCategory.AskQuestion)
-                it.putExtra("socialAppName", socialApp.name)
-                it.putExtra("socialAppPackageName", socialApp.packageName)
-
-                PendingIntent.getActivity(context, appWidgetId, it, 0)
-            }
-
-            RemoteViews(context.packageName, R.layout.widget).let {
-                it.setImageViewResource(R.id.widget_button, socialApp.imageId)
-                it.setOnClickPendingIntent(R.id.widget_button, pendingIntent)
-
-                appWidgetManager.updateAppWidget(appWidgetId, it)
-            }
-        }
-    }
-}
-
-class WidgetConfiguratorActivity : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.social_apps_grid)
-
-        val appWidgetId = intent?.extras?.getInt(
-            AppWidgetManager.EXTRA_APPWIDGET_ID,
-            AppWidgetManager.INVALID_APPWIDGET_ID
-        ) ?: AppWidgetManager.INVALID_APPWIDGET_ID
-
-        findViewById<GridView>(R.id.social_apps_grid).adapter =
-            SocialAppAdapter(this) { context, socialApp ->
-                appWidgetIdToSocialApp[appWidgetId] = socialApp
-
-                AppWidgetManager.getInstance(context).let {
-                    MyAppWidgetProvider.updateAppWidget(context, it, appWidgetId)
-                }
-
-                setResult(Activity.RESULT_OK, Intent().apply {
-                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-                })
-
-                finish()
-            }
     }
 }
