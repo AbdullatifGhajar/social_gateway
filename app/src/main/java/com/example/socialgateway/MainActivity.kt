@@ -37,26 +37,14 @@ fun log(message: String) {
     Log.d("SocialGateway", message)
 }
 
-data class SocialApp(
-    val name: String,
-    val packageName: String,
-    val imageId: Int)
-
-val socialApps = listOf(
-    SocialApp("Telegram", "org.telegram.messenger", R.drawable.telegram),
-    SocialApp("WhatsApp", "com.whatsapp", R.drawable.whatsapp),
-    SocialApp("Facebook", "com.facebook.katana", R.drawable.facebook),
-    SocialApp("Facebook Messenger", "com.facebook.orca", R.drawable.facebook_messenger),
-    SocialApp("Instagram", "com.instagram.android", R.drawable.instagram),
-    SocialApp("Signal", "org.thoughtcrime.securesms", R.drawable.signal),
-    SocialApp("Snapchat", "com.snapchat.android", R.drawable.snapchat))
-
-
-class SocialAppAdapter(private val context: Context, private val onClick: (Context, SocialApp) -> Unit)
-        : BaseAdapter() {
+class SocialAppAdapter(
+    private val context: Context,
+    private val onClick: (Context, SocialApp) -> Unit
+) : BaseAdapter() {
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-        val socialApp = socialApps[position]
-        val imageView = convertView as? ImageView ?:ImageView(context).apply {
+        val socialApp = SocialApps[position]
+        val imageView = convertView as? ImageView ?: ImageView(context).apply {
+            // otherwise icons will be far from each other
             adjustViewBounds = true
         }
 
@@ -67,15 +55,16 @@ class SocialAppAdapter(private val context: Context, private val onClick: (Conte
     }
 
     override fun getItem(position: Int): Any {
-        return socialApps[position]
+        return SocialApps[position]
     }
 
     override fun getItemId(position: Int): Long {
+        // why toLong()?
         return position.toLong()
     }
 
     override fun getCount(): Int {
-        return socialApps.size
+        return SocialApps.size
     }
 }
 
@@ -86,14 +75,16 @@ class MainActivity : AppCompatActivity() {
     private lateinit var userId: String
     private lateinit var preferences: SharedPreferences
 
-
+    // TODO hide this key
     private val key = "hef3TF^Vg90546bvgFVL>Zzxskfou;aswperwrsf,c/x"
 
     private fun openConnection(route: String, arguments: String = ""): HttpURLConnection {
+        // why?
         assert(!route.contains('?'))
         return URL("https://hpi.de/baudisch/projects/neo4j/api$route?key=$key&$arguments").openConnection() as HttpURLConnection
     }
 
+    // TODO create class responsible for connections
     private fun postToServer(data: ByteArray, route: String, arguments: String = "") {
         AsyncTask.execute {
             openConnection(route, arguments).apply {
@@ -114,26 +105,30 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun requestQuestion(socialAppName: String, socialAppIntent: Intent? = null): String? {
-        assert(Looper.myLooper() != Looper.getMainLooper())  // make sure network request is not done on UI thread
+        // make sure network request is not done on UI thread
+        assert(Looper.myLooper() != Looper.getMainLooper())
 
         val encodedAppName = URLEncoder.encode(socialAppName, "utf-8")
         val language = if (Locale.getDefault().language == "de") "german" else "english"
         val questionType = if (socialAppIntent == null) "reflection" else "normal"
         val questionConnection = openConnection(
-            "/question","app_name=$encodedAppName&language=$language&question_type=$questionType")
+            "/question", "app_name=$encodedAppName&language=$language&question_type=$questionType"
+        )
 
         try {
             if (questionConnection.responseCode != HTTP_OK) {
                 throw ConnectException("response code ${questionConnection.responseCode}")
             }
-
-            // success, return question
             return questionConnection.inputStream.reader().readText()
         } catch (exception: ConnectException) {
-            // something went wrong. display error, start the app
             runOnUiThread {
-                Toast.makeText(this, resources.getString(R.string.server_unreachable), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    resources.getString(R.string.server_unreachable),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
+            // why start the app only when something went wrong?
             socialAppIntent?.let { startActivity(it) }
             log("could not request question: ${exception.message.orEmpty()}")
             finish()
@@ -143,9 +138,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun createNotificationChannel() {
-        // copy pasted from https://developer.android.com/training/notify-user/build-notification
-
+    private fun createNotificationChannel() { // https://developer.android.com/training/notify-user/build-notification
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -164,7 +157,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun scheduleReflectionQuestion(socialAppName: String) {
         AsyncTask.execute {
-            val question = requestQuestion(socialAppName) ?: return@execute  // TODO request reflection question
+            val question = requestQuestion(socialAppName)
+                ?: return@execute  // TODO request reflection question
 
             runOnUiThread {
                 val intent = Intent(this, MainActivity::class.java).apply {
@@ -173,9 +167,11 @@ class MainActivity : AppCompatActivity() {
                     putExtra("question", question)
                     putExtra("socialAppName", socialAppName)
                 }
+                // TODO replace 0
                 val pendingIntent = PendingIntent.getActivity(this, question.hashCode(), intent, 0)
 
                 val builder = NotificationCompat.Builder(this, channelId)
+                    // TODO change icon
                     .setSmallIcon(R.drawable.placeholder)
                     .setContentTitle(getString(R.string.reflection_question))
                     .setContentText(question)
@@ -185,11 +181,13 @@ class MainActivity : AppCompatActivity() {
                     .setAutoCancel(true)
 
                 // show the reflection question notification with some minutes delay
+                val minutes = 10
                 Handler().postDelayed({
                     // notificationId is a unique int for each notification that you must define
                     val notificationId = System.currentTimeMillis() % Int.MAX_VALUE
-                    NotificationManagerCompat.from(this).notify(notificationId.toInt(), builder.build())
-                }, 10 * 60 * 1000)
+                    NotificationManagerCompat.from(this)
+                        .notify(notificationId.toInt(), builder.build())
+                }, (minutes * 60 * 1000).toLong())
             }
         }
     }
@@ -198,21 +196,33 @@ class MainActivity : AppCompatActivity() {
         return DateFormat.format("dd.MM.yyyy", Date()) as String?
     }
 
-    @SuppressLint("InflateParams")
-    private fun showResponseDialog(question: String, socialAppName: String, socialAppIntent: Intent? = null) {
+    // @SuppressLint("InflateParams")
+    private fun showResponseDialog(
+        question: String,
+        socialAppName: String,
+        socialAppIntent: Intent? = null
+    ) {
         assert(question.isNotBlank() && socialAppName.isNotBlank())
 
         val linearLayout = layoutInflater.inflate(R.layout.answer_dialog, null)
         val answerEditText = linearLayout.findViewById<EditText>(R.id.answer_edit_text)
-
         val answerRecordAudioButton = linearLayout.findViewById<Button>(R.id.answer_record_audio_button)
         var mediaRecorder: MediaRecorder? = null
+
         answerRecordAudioButton.setOnClickListener {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
-                    != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO), 82)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                // why 82? use other methods to request permissions
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.RECORD_AUDIO),
+                    82
+                )
             } else {
+                // TODO refactor branching
                 when {
+                    // TODO don't rely on text
                     answerRecordAudioButton.text == getString(R.string.delete_recording) -> {
                         getAnswerAudioFile().delete()
                         answerRecordAudioButton.text = getString(R.string.start_recording)
@@ -255,7 +265,8 @@ class MainActivity : AppCompatActivity() {
                     preferences.edit().apply {
                         putString(socialAppName, today())
                         putString("lastQuestionDate", today())
-                        val questionsOnLastQuestionDate = preferences.getInt("questionsOnLastQuestionDate", 0)
+                        val questionsOnLastQuestionDate =
+                            preferences.getInt("questionsOnLastQuestionDate", 0)
                         putInt("questionsOnLastQuestionDate", questionsOnLastQuestionDate + 1)
                         apply()
                     }
@@ -285,14 +296,19 @@ class MainActivity : AppCompatActivity() {
         // check if the user was already asked a question for this app or two questions for any apps today
         if (preferences.getString(socialAppName, "") == today()
             || (preferences.getString("lastQuestionDate", "") == today()
-                && preferences.getInt("questionsOnLastQuestionDate", 0) >= 2)) {
+                    && preferences.getInt("questionsOnLastQuestionDate", 0) >= 2)
+        ) {
             startActivity(socialAppIntent)
             finish()
             return
         }
 
         // request a question from the server
-        Toast.makeText(mainActivity, resources.getString(R.string.requesting_question_from_server), Toast.LENGTH_SHORT).show()
+        Toast.makeText(
+            mainActivity,
+            resources.getString(R.string.requesting_question_from_server),
+            Toast.LENGTH_SHORT
+        ).show()
         AsyncTask.execute {
             val question = requestQuestion(socialAppName, socialAppIntent) ?: return@execute
 
@@ -316,23 +332,28 @@ class MainActivity : AppCompatActivity() {
         }
         log("userId: $userId")
 
-        findViewById<GridView>(R.id.social_apps_grid).adapter = SocialAppAdapter(this) { context, socialApp ->
-            startActivity(Intent(context, MainActivity::class.java).apply {
-                putExtra("intentCategory", IntentCategory.AskQuestion)
-                putExtra("socialAppName", socialApp.name)
-                putExtra("socialAppPackageName", socialApp.packageName)
-            })
-        }
+        findViewById<GridView>(R.id.social_apps_grid).adapter =
+            SocialAppAdapter(this) { context, socialApp ->
+                startActivity(Intent(context, MainActivity::class.java).apply {
+                    putExtra("intentCategory", IntentCategory.AskQuestion)
+                    putExtra("socialAppName", socialApp.name)
+                    putExtra("socialAppPackageName", socialApp.packageName)
+                })
+            }
 
         intent?.extras?.let {
             when (it.getSerializable("intentCategory") as? IntentCategory) {
                 IntentCategory.AskQuestion -> {
-                    questionResponseProcess(it.getString("socialAppName").orEmpty(),
-                                            it.getString("socialAppPackageName").orEmpty())
+                    questionResponseProcess(
+                        it.getString("socialAppName").orEmpty(),
+                        it.getString("socialAppPackageName").orEmpty()
+                    )
                 }
                 IntentCategory.Reflection -> {
-                    showResponseDialog(it.getString("question").orEmpty(),
-                                       it.getString("socialAppName").orEmpty())
+                    showResponseDialog(
+                        it.getString("question").orEmpty(),
+                        it.getString("socialAppName").orEmpty()
+                    )
                 }
                 IntentCategory.CheckIn -> {
                     showResponseDialog(it.getString("question").orEmpty(), "check-in")
@@ -347,10 +368,17 @@ class MainActivity : AppCompatActivity() {
             set(SECOND, 0)
         }.timeInMillis
 
-        val pendingIntent = PendingIntent.getBroadcast(this, 346538746,
-            Intent(this, AlarmReceiver::class.java), PendingIntent.FLAG_UPDATE_CURRENT)
+        val pendingIntent = PendingIntent.getBroadcast(
+            this, 346538746,
+            Intent(this, AlarmReceiver::class.java), PendingIntent.FLAG_UPDATE_CURRENT
+        )
 
-        alarmManager.setRepeating(AlarmManager.RTC, dailyTriggerTime, AlarmManager.INTERVAL_DAY, pendingIntent)
+        alarmManager.setRepeating(
+            AlarmManager.RTC,
+            dailyTriggerTime,
+            AlarmManager.INTERVAL_DAY,
+            pendingIntent
+        )
     }
 
     private fun sendAnswer(appName: String, question: String, answerText: String) {
@@ -364,20 +392,24 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        postToServer(JSONObject("""{
+        postToServer(
+            JSONObject(
+                """{
             "user_id": "$userId",
             "app_name": "$appName",
             "question": "$question",
             "answer_text": "$answerText",
             "answer_audio_uuid": "$answerAudioUuid"
-        }""").toString().toByteArray(), "/answer")
+        }"""
+            ).toString().toByteArray(), "/answer"
+        )
     }
 
     private fun getAnswerAudioFile(): File {
         return cacheDir.resolve("social_gateway_answer_audio.aac")
     }
 
-    private fun startAudioRecording() : MediaRecorder {
+    private fun startAudioRecording(): MediaRecorder {
         return MediaRecorder().apply {
             setAudioSource(MediaRecorder.AudioSource.MIC)
             setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS)
@@ -400,14 +432,22 @@ class MainActivity : AppCompatActivity() {
 val appWidgetIdToSocialApp = mutableMapOf<Int, SocialApp>()
 
 class MyAppWidgetProvider : AppWidgetProvider() {
-    override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
+    override fun onUpdate(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetIds: IntArray
+    ) {
         appWidgetIds.forEach { appWidgetId ->
             updateAppWidget(context, appWidgetManager, appWidgetId)
         }
     }
 
     companion object {
-        fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
+        fun updateAppWidget(
+            context: Context,
+            appWidgetManager: AppWidgetManager,
+            appWidgetId: Int
+        ) {
             val socialApp = appWidgetIdToSocialApp[appWidgetId] ?: return
 
             val pendingIntent = Intent(context, MainActivity::class.java).let {
@@ -433,21 +473,24 @@ class WidgetConfiguratorActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.social_apps_grid)
 
-        val appWidgetId = intent?.extras?.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID,
-            AppWidgetManager.INVALID_APPWIDGET_ID) ?: AppWidgetManager.INVALID_APPWIDGET_ID
+        val appWidgetId = intent?.extras?.getInt(
+            AppWidgetManager.EXTRA_APPWIDGET_ID,
+            AppWidgetManager.INVALID_APPWIDGET_ID
+        ) ?: AppWidgetManager.INVALID_APPWIDGET_ID
 
-        findViewById<GridView>(R.id.social_apps_grid).adapter = SocialAppAdapter(this) { context, socialApp ->
-            appWidgetIdToSocialApp[appWidgetId] = socialApp
+        findViewById<GridView>(R.id.social_apps_grid).adapter =
+            SocialAppAdapter(this) { context, socialApp ->
+                appWidgetIdToSocialApp[appWidgetId] = socialApp
 
-            AppWidgetManager.getInstance(context).let {
-                MyAppWidgetProvider.updateAppWidget(context, it, appWidgetId)
+                AppWidgetManager.getInstance(context).let {
+                    MyAppWidgetProvider.updateAppWidget(context, it, appWidgetId)
+                }
+
+                setResult(Activity.RESULT_OK, Intent().apply {
+                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+                })
+
+                finish()
             }
-
-            setResult(Activity.RESULT_OK, Intent().apply {
-                putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-            })
-
-            finish()
-        }
     }
 }
