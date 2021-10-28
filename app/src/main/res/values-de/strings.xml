@@ -19,4 +19,6 @@
     <string name="check_in_question_value">
         Wenn du daran denkst wie du dein Smartphone heute genutzt hast, wie fühlst du dich?
     </string>
+    <string name="no_internet_connection_available">keine Internetverbindung verfügbar</string>
+    <string name="unknown_error">unbekannter Fehler</string>
 </resources>

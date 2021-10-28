@@ -20,13 +20,13 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".WidgetConfiguratorActivity">
+        <activity android:name=".SocialGatewayWidgetConfigurationActivity">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
             </intent-filter>
         </activity>
 
-        <receiver android:name="MyAppWidgetProvider">
+        <receiver android:name=".SocialGatewayWidgetProvider">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
             </intent-filter>

@@ -1,10 +1,7 @@
 package com.example.socialgateway
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.*
-import android.appwidget.AppWidgetManager
-import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -18,16 +15,11 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.text.format.DateFormat
 import android.util.Log
-import android.view.View
-import android.view.ViewGroup
 import android.widget.*
 import org.json.JSONObject
 import java.io.File
 import java.net.ConnectException
-import java.net.HttpURLConnection
-import java.net.HttpURLConnection.HTTP_OK
-import java.net.URL
-import java.net.URLEncoder
+import java.net.UnknownHostException
 import java.util.*
 import java.util.Calendar.*
 
@@ -45,56 +37,29 @@ class MainActivity : AppCompatActivity() {
     private lateinit var userId: String
     private lateinit var preferences: SharedPreferences
 
-    // TODO hide this key
-    private val key = "hef3TF^Vg90546bvgFVL>Zzxskfou;aswperwrsf,c/x"
-
-    private fun openConnection(route: String, arguments: String = ""): HttpURLConnection {
-        // why?
-        assert(!route.contains('?'))
-        return URL("https://hpi.de/baudisch/projects/neo4j/api$route?key=$key&$arguments").openConnection() as HttpURLConnection
-    }
-
-    // TODO create class responsible for connections
-    private fun postToServer(data: ByteArray, route: String, arguments: String = "") {
-        AsyncTask.execute {
-            openConnection(route, arguments).apply {
-                try {
-                    requestMethod = "POST"
-                    doOutput = true
-                    outputStream.write(data)
-                    if (responseCode != HTTP_OK) {
-                        throw ConnectException("response code $responseCode")
-                    }
-                } catch (exception: ConnectException) {
-                    log("could not send answer: ${exception.message.orEmpty()}")
-                } finally {
-                    disconnect()
-                }
-            }
-        }
-    }
-
     private fun requestQuestion(socialAppName: String, socialAppIntent: Intent? = null): String? {
-        // make sure network request is not done on UI thread
+        // make sure network request is not done on UI thread???
         assert(Looper.myLooper() != Looper.getMainLooper())
 
-        val encodedAppName = URLEncoder.encode(socialAppName, "utf-8")
+        // TODO do we need to give these information to server interface
         val language = if (Locale.getDefault().language == "de") "german" else "english"
         val questionType = if (socialAppIntent == null) "reflection" else "normal"
-        val questionConnection = openConnection(
-            "/question", "app_name=$encodedAppName&language=$language&question_type=$questionType"
-        )
+
 
         try {
-            if (questionConnection.responseCode != HTTP_OK) {
-                throw ConnectException("response code ${questionConnection.responseCode}")
-            }
-            return questionConnection.inputStream.reader().readText()
-        } catch (exception: ConnectException) {
+            return ServerInterface().getQuestion(socialAppName, language, questionType)
+        } catch (exception: Exception) {
+            val errorMessage = resources.getString(
+                when (exception) {
+                    is ConnectException -> R.string.server_unreachable
+                    is UnknownHostException -> R.string.no_internet_connection_available
+                    else -> R.string.unknown_error
+                }
+            )
             runOnUiThread {
                 Toast.makeText(
                     this,
-                    resources.getString(R.string.server_unreachable),
+                    errorMessage,
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -103,8 +68,6 @@ class MainActivity : AppCompatActivity() {
             log("could not request question: ${exception.message.orEmpty()}")
             finish()
             return null
-        } finally {
-            questionConnection.disconnect()
         }
     }
 
@@ -176,7 +139,8 @@ class MainActivity : AppCompatActivity() {
 
         val linearLayout = layoutInflater.inflate(R.layout.answer_dialog, null)
         val answerEditText = linearLayout.findViewById<EditText>(R.id.answer_edit_text)
-        val answerRecordAudioButton = linearLayout.findViewById<Button>(R.id.answer_record_audio_button)
+        val answerRecordAudioButton =
+            linearLayout.findViewById<Button>(R.id.answer_record_audio_button)
         var mediaRecorder: MediaRecorder? = null
 
         answerRecordAudioButton.setOnClickListener {
@@ -357,12 +321,12 @@ class MainActivity : AppCompatActivity() {
         getAnswerAudioFile().let {
             if (it.exists()) {
                 answerAudioUuid = UUID.randomUUID().toString()
-                postToServer(it.readBytes(), "/audio", "uuid=$answerAudioUuid")
+                ServerInterface().postToServer(it.readBytes(), "/audio", "uuid=$answerAudioUuid")
                 it.delete()
             }
         }
 
-        postToServer(
+        ServerInterface().postToServer(
             JSONObject(
                 """{
             "user_id": "$userId",
