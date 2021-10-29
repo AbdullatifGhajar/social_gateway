@@ -16,7 +16,6 @@ import android.support.v7.app.AppCompatActivity
 import android.text.format.DateFormat
 import android.util.Log
 import android.widget.*
-import org.json.JSONObject
 import java.io.File
 import java.net.ConnectException
 import java.net.UnknownHostException
@@ -63,8 +62,6 @@ class MainActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
             }
-            // why start the app only when something went wrong?
-            socialAppIntent?.let { startActivity(it) }
             log("could not request question: ${exception.message.orEmpty()}")
             finish()
             return null
@@ -132,10 +129,9 @@ class MainActivity : AppCompatActivity() {
     // @SuppressLint("InflateParams")
     private fun showResponseDialog(
         question: String,
-        socialAppName: String,
-        socialAppIntent: Intent? = null
+        socialApp: SocialApp
     ) {
-        assert(question.isNotBlank() && socialAppName.isNotBlank())
+        assert(question.isNotBlank())
 
         val linearLayout = layoutInflater.inflate(R.layout.answer_dialog, null)
         val answerEditText = linearLayout.findViewById<EditText>(R.id.answer_edit_text)
@@ -188,16 +184,23 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 // send the answer to the server and start the app
-                sendAnswer(socialAppName, question, answerEditText.text.toString())
+                ServerInterface().sendAnswer(
+                    socialApp.name,
+                    userId,
+                    question,
+                    answerEditText.text.toString(),
+                    getAnswerAudioFile()
+                )
 
                 // socialAppIntent is null for reflection and check-in questions
-                if (socialAppIntent != null) {
-                    scheduleReflectionQuestion(socialAppName)
-                    startActivity(socialAppIntent)
+                // TODO use if reflection or check-in instead
+                if (socialApp != null) {
+                    scheduleReflectionQuestion(socialApp.name)
+                    startApp(socialApp)
 
                     // track when the question was answered, so more questions are asked for this app today
                     preferences.edit().apply {
-                        putString(socialAppName, today())
+                        putString(socialApp.name, today())
                         putString("lastQuestionDate", today())
                         val questionsOnLastQuestionDate =
                             preferences.getInt("questionsOnLastQuestionDate", 0)
@@ -211,43 +214,51 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun questionResponseProcess(socialAppName: String, socialAppPackageName: String) {
-        assert(socialAppName.isNotBlank() && socialAppPackageName.isNotBlank())
+    private fun startApp(socialApp: SocialApp) {
+        startActivity(packageManager.getLaunchIntentForPackage(socialApp.packageName))
+    }
 
+    // check if the user was already asked a question for this app or two questions for any apps today
+    private fun shouldReceiveQuestion(socialApp: SocialApp): Boolean {
+        return (preferences.getString(socialApp.name, "") == today()
+                || (preferences.getString("lastQuestionDate", "") == today()
+                && preferences.getInt("questionsOnLastQuestionDate", 0) >= 2)
+                )
+    }
+
+    private fun isInstalled(socialApp: SocialApp): Boolean{
+        return packageManager.getLaunchIntentForPackage(socialApp.packageName) != null
+    }
+
+    // TODO take social app: SocialApp
+    private fun askQuestion(socialApp: SocialApp) {
         val mainActivity = this
+        val socialAppIntent = packageManager.getLaunchIntentForPackage(socialApp.packageName)
 
-        val socialAppIntent = packageManager.getLaunchIntentForPackage(socialAppPackageName)
-
-        // check if the given app is installed on the device
-        if (socialAppIntent == null) {
-            resources.getString(R.string.X_was_not_found_on_your_device, socialAppName).let {
+        if (!isInstalled(socialApp)) {
+            resources.getString(R.string.X_was_not_found_on_your_device, socialApp.name).let {
                 Toast.makeText(mainActivity, it, Toast.LENGTH_LONG).show()
             }
+            // TODO don't load the whole activity. Use fragments instead
             finish()
             return
         }
 
-        // check if the user was already asked a question for this app or two questions for any apps today
-        if (preferences.getString(socialAppName, "") == today()
-            || (preferences.getString("lastQuestionDate", "") == today()
-                    && preferences.getInt("questionsOnLastQuestionDate", 0) >= 2)
-        ) {
-            startActivity(socialAppIntent)
+        // TODO KATIE should the app close this way?
+        if (!shouldReceiveQuestion(socialApp)) {
             finish()
             return
         }
 
-        // request a question from the server
-        Toast.makeText(
-            mainActivity,
-            resources.getString(R.string.requesting_question_from_server),
-            Toast.LENGTH_SHORT
-        ).show()
         AsyncTask.execute {
-            val question = requestQuestion(socialAppName, socialAppIntent) ?: return@execute
-
-            runOnUiThread {
-                showResponseDialog(question, socialAppName, socialAppIntent)
+            val question = requestQuestion(socialApp.name, socialAppIntent)
+            if (question == null) {
+                scheduleReflectionQuestion(socialApp.name)
+                startActivity(socialAppIntent)
+            } else {
+                runOnUiThread {
+                    showResponseDialog(question, socialApp)
+                }
             }
         }
     }
@@ -275,22 +286,23 @@ class MainActivity : AppCompatActivity() {
                 })
             }
 
-        intent?.extras?.let {
-            when (it.getSerializable("intentCategory") as? IntentCategory) {
+        intent?.extras?.let { intent ->
+
+            when (intent.getSerializable("intentCategory") as? IntentCategory) {
                 IntentCategory.AskQuestion -> {
-                    questionResponseProcess(
-                        it.getString("socialAppName").orEmpty(),
-                        it.getString("socialAppPackageName").orEmpty()
+                    askQuestion(
+                        SocialApps.first { it.name == intent.getString("socialAppName") }
                     )
                 }
                 IntentCategory.Reflection -> {
                     showResponseDialog(
-                        it.getString("question").orEmpty(),
-                        it.getString("socialAppName").orEmpty()
+                        intent.getString("question").orEmpty(),
+                        SocialApps.first { it.name == intent.getString("socialAppName") }
                     )
                 }
                 IntentCategory.CheckIn -> {
-                    showResponseDialog(it.getString("question").orEmpty(), "check-in")
+                    // TODO use a parameter mode = "check-in"
+                    showResponseDialog(intent.getString("question").orEmpty(), SocialApps[0])
                 }
             }
         }
@@ -312,30 +324,6 @@ class MainActivity : AppCompatActivity() {
             dailyTriggerTime,
             AlarmManager.INTERVAL_DAY,
             pendingIntent
-        )
-    }
-
-    private fun sendAnswer(appName: String, question: String, answerText: String) {
-        var answerAudioUuid = "null"
-
-        getAnswerAudioFile().let {
-            if (it.exists()) {
-                answerAudioUuid = UUID.randomUUID().toString()
-                ServerInterface().postToServer(it.readBytes(), "/audio", "uuid=$answerAudioUuid")
-                it.delete()
-            }
-        }
-
-        ServerInterface().postToServer(
-            JSONObject(
-                """{
-            "user_id": "$userId",
-            "app_name": "$appName",
-            "question": "$question",
-            "answer_text": "$answerText",
-            "answer_audio_uuid": "$answerAudioUuid"
-        }"""
-            ).toString().toByteArray(), "/answer"
         )
     }
 

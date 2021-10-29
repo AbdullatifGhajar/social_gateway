@@ -1,16 +1,20 @@
 package com.example.socialgateway
 
 import android.os.AsyncTask
+import org.json.JSONObject
+import java.io.File
 import java.net.ConnectException
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
+import java.util.*
 
 
 class ServerInterface {
     // TODO hide this key
     private val key = "hef3TF^Vg90546bvgFVL>Zzxskfou;aswperwrsf,c/x"
 
+    // TODO can I just close the connection?
     private fun openConnection(route: String, arguments: String = ""): HttpURLConnection {
         // why?
         assert(!route.contains('?'))
@@ -18,7 +22,7 @@ class ServerInterface {
         return URL("https://hpi.de/baudisch/projects/neo4j/api$route?key=$key&$arguments").openConnection() as HttpURLConnection
     }
 
-    fun postToServer(data: ByteArray, route: String, arguments: String = "") {
+    private fun postToServer(data: ByteArray, route: String, arguments: String = "") {
         AsyncTask.execute {
             openConnection(route, arguments).apply {
                 try {
@@ -51,5 +55,35 @@ class ServerInterface {
             throw ConnectException("response code ${questionConnection.responseCode}")
 
         return questionConnection.inputStream.reader().readText()
+    }
+
+    fun sendAnswer(
+        appName: String,
+        userId: String,
+        question: String,
+        answerText: String,
+        audio: File
+    ) {
+        var answerAudioUuid = "null"
+
+        audio.let {
+            if (it.exists()) {
+                answerAudioUuid = UUID.randomUUID().toString()
+                postToServer(it.readBytes(), "/audio", "uuid=$answerAudioUuid")
+                it.delete()
+            }
+        }
+
+        postToServer(
+            JSONObject(
+                """{
+            "user_id": "$userId",
+            "app_name": "$appName",
+            "question": "$question",
+            "answer_text": "$answerText",
+            "answer_audio_uuid": "$answerAudioUuid"
+        }"""
+            ).toString().toByteArray(), "/answer"
+        )
     }
 }
