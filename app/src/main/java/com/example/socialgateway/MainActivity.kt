@@ -88,7 +88,7 @@ class MainActivity : AppCompatActivity() {
     private fun scheduleReflectionQuestion(socialAppName: String) {
         AsyncTask.execute {
             val question = requestQuestion(socialAppName)
-                ?: return@execute  // TODO request reflection question
+                ?: return@execute  // TODO NOTMINE request reflection question
 
             runOnUiThread {
                 val intent = Intent(this, MainActivity::class.java).apply {
@@ -97,8 +97,7 @@ class MainActivity : AppCompatActivity() {
                     putExtra("question", question)
                     putExtra("socialAppName", socialAppName)
                 }
-                // TODO replace 0
-                val pendingIntent = PendingIntent.getActivity(this, question.hashCode(), intent, 0)
+                val pendingIntent = PendingIntent.getActivity(this, question.hashCode(), intent, PendingIntent.FLAG_ONE_SHOT)
 
                 val builder = NotificationCompat.Builder(this, channelId)
                     // TODO change icon
@@ -176,7 +175,9 @@ class MainActivity : AppCompatActivity() {
         AlertDialog.Builder(this).apply {
             setMessage(question)
             setView(linearLayout)
-            setNegativeButton(android.R.string.cancel) { _, _ -> }
+            setNegativeButton(android.R.string.cancel) { _, _ ->
+                finish()
+            }
             setPositiveButton(android.R.string.ok) { _, _ ->
                 mediaRecorder?.apply {
                     stop()
@@ -225,7 +226,7 @@ class MainActivity : AppCompatActivity() {
                 )
     }
 
-    private fun isInstalled(socialApp: SocialApp): Boolean{
+    private fun isInstalled(socialApp: SocialApp): Boolean {
         return packageManager.getLaunchIntentForPackage(socialApp.packageName) != null
     }
 
@@ -270,7 +271,7 @@ class MainActivity : AppCompatActivity() {
 
         preferences = getPreferences(Context.MODE_PRIVATE)
 
-        userId = preferences.getString("userId", "").orEmpty().ifBlank {
+        userId = preferences.getString("userId", "").ifEmpty {
             log("generating new userId")
             UUID.randomUUID().toString()
         }
@@ -281,7 +282,6 @@ class MainActivity : AppCompatActivity() {
                 startActivity(Intent(context, MainActivity::class.java).apply {
                     putExtra("intentCategory", IntentCategory.AskQuestion)
                     putExtra("socialAppName", socialApp.name)
-                    putExtra("socialAppPackageName", socialApp.packageName)
                 })
             }
 
