@@ -129,7 +129,7 @@ class MainActivity : AppCompatActivity() {
     // @SuppressLint("InflateParams")
     private fun showResponseDialog(
         question: String,
-        socialApp: SocialApp
+        socialApp: SocialApp?
     ) {
         assert(question.isNotBlank())
 
@@ -185,15 +185,14 @@ class MainActivity : AppCompatActivity() {
 
                 // send the answer to the server and start the app
                 ServerInterface().sendAnswer(
-                    socialApp.name,
+                    // TODO KATIE how should check-in work
+                    socialApp?.name ?: "check-in",
                     userId,
                     question,
                     answerEditText.text.toString(),
                     getAnswerAudioFile()
                 )
 
-                // socialAppIntent is null for reflection and check-in questions
-                // TODO use if reflection or check-in instead
                 if (socialApp != null) {
                     scheduleReflectionQuestion(socialApp.name)
                     startApp(socialApp)
@@ -220,7 +219,7 @@ class MainActivity : AppCompatActivity() {
 
     // check if the user was already asked a question for this app or two questions for any apps today
     private fun shouldReceiveQuestion(socialApp: SocialApp): Boolean {
-        return (preferences.getString(socialApp.name, "") == today()
+        return (preferences.getString(socialApp.name, "") == today() // TODO what is this?
                 || (preferences.getString("lastQuestionDate", "") == today()
                 && preferences.getInt("questionsOnLastQuestionDate", 0) >= 2)
                 )
@@ -230,7 +229,6 @@ class MainActivity : AppCompatActivity() {
         return packageManager.getLaunchIntentForPackage(socialApp.packageName) != null
     }
 
-    // TODO take social app: SocialApp
     private fun askQuestion(socialApp: SocialApp) {
         val mainActivity = this
         val socialAppIntent = packageManager.getLaunchIntentForPackage(socialApp.packageName)
@@ -246,6 +244,7 @@ class MainActivity : AppCompatActivity() {
 
         // TODO KATIE should the app close this way?
         if (!shouldReceiveQuestion(socialApp)) {
+            startApp(socialApp)
             finish()
             return
         }
@@ -301,8 +300,7 @@ class MainActivity : AppCompatActivity() {
                     )
                 }
                 IntentCategory.CheckIn -> {
-                    // TODO use a parameter mode = "check-in"
-                    showResponseDialog(intent.getString("question").orEmpty(), SocialApps[0])
+                    showResponseDialog(intent.getString("question").orEmpty(), null)
                 }
             }
         }
