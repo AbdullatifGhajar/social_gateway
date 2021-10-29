@@ -42,8 +42,9 @@ class ServerInterface {
     }
 
     // TODO use socialApp: SocialApp instead of socialAppName: String?
-    fun getQuestion(socialAppName: String, language: String, questionType: String): String {
+    fun getQuestion(socialAppName: String, questionType: String): String {
         val encodedAppName = URLEncoder.encode(socialAppName, "utf-8")
+        val language = if (Locale.getDefault().language == "de") "german" else "english"
         val questionConnection = ServerInterface().openConnection(
             "/question",
             "app_name=$encodedAppName&language=$language&question_type=$questionType"

@@ -36,17 +36,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var userId: String
     private lateinit var preferences: SharedPreferences
 
-    private fun requestQuestion(socialAppName: String, socialAppIntent: Intent? = null): String? {
+    private fun requestQuestion(socialAppName: String, questionType: String = "normal"): String? {
         // make sure network request is not done on UI thread???
         assert(Looper.myLooper() != Looper.getMainLooper())
 
-        // TODO do we need to give these information to server interface
-        val language = if (Locale.getDefault().language == "de") "german" else "english"
-        val questionType = if (socialAppIntent == null) "reflection" else "normal"
-
-
         try {
-            return ServerInterface().getQuestion(socialAppName, language, questionType)
+            return ServerInterface().getQuestion(socialAppName, questionType)
         } catch (exception: Exception) {
             val errorMessage = resources.getString(
                 when (exception) {
@@ -63,9 +58,8 @@ class MainActivity : AppCompatActivity() {
                 ).show()
             }
             log("could not request question: ${exception.message.orEmpty()}")
-            finish()
-            return null
         }
+        return null
     }
 
     private fun createNotificationChannel() { // https://developer.android.com/training/notify-user/build-notification
@@ -87,8 +81,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun scheduleReflectionQuestion(socialAppName: String) {
         AsyncTask.execute {
-            val question = requestQuestion(socialAppName)
-                ?: return@execute  // TODO NOTMINE request reflection question
+            val question = requestQuestion(socialAppName, "reflection")
+                ?: return@execute
 
             runOnUiThread {
                 val intent = Intent(this, MainActivity::class.java).apply {
@@ -97,7 +91,12 @@ class MainActivity : AppCompatActivity() {
                     putExtra("question", question)
                     putExtra("socialAppName", socialAppName)
                 }
-                val pendingIntent = PendingIntent.getActivity(this, question.hashCode(), intent, PendingIntent.FLAG_ONE_SHOT)
+                val pendingIntent = PendingIntent.getActivity(
+                    this,
+                    question.hashCode(),
+                    intent,
+                    PendingIntent.FLAG_ONE_SHOT
+                )
 
                 val builder = NotificationCompat.Builder(this, channelId)
                     // TODO change icon
@@ -121,11 +120,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun today(): String? {
-        return DateFormat.format("dd.MM.yyyy", Date()) as String?
+    private fun today(): String {
+        return DateFormat.format("dd.MM.yyyy", Date()) as String
     }
 
-    // @SuppressLint("InflateParams")
     private fun showResponseDialog(
         question: String,
         socialApp: SocialApp?
@@ -220,8 +218,7 @@ class MainActivity : AppCompatActivity() {
 
     // check if the user was already asked a question for this app or two questions for any apps today
     private fun shouldReceiveQuestion(socialApp: SocialApp): Boolean {
-        return (preferences.getString(socialApp.name, "") == today() // TODO what is this?
-                || (preferences.getString("lastQuestionDate", "") == today()
+        return ((preferences.getString("lastQuestionDate", "") == today()
                 && preferences.getInt("questionsOnLastQuestionDate", 0) >= 2)
                 )
     }
@@ -231,12 +228,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun askQuestion(socialApp: SocialApp) {
-        val mainActivity = this
-        val socialAppIntent = packageManager.getLaunchIntentForPackage(socialApp.packageName)
-
         if (!isInstalled(socialApp)) {
             resources.getString(R.string.X_was_not_found_on_your_device, socialApp.name).let {
-                Toast.makeText(mainActivity, it, Toast.LENGTH_LONG).show()
+                Toast.makeText(this, it, Toast.LENGTH_LONG).show()
             }
             // TODO don't load the whole activity. Use fragments instead
             finish()
@@ -251,15 +245,30 @@ class MainActivity : AppCompatActivity() {
         }
 
         AsyncTask.execute {
-            val question = requestQuestion(socialApp.name, socialAppIntent)
+            val question = requestQuestion(socialApp.name)
             if (question == null) {
                 scheduleReflectionQuestion(socialApp.name)
-                startActivity(socialAppIntent)
+                startApp(socialApp)
             } else {
                 runOnUiThread {
                     showResponseDialog(question, socialApp)
                 }
             }
+        }
+    }
+
+    private fun getAnswerAudioFile(): File {
+        return cacheDir.resolve("social_gateway_answer_audio.aac")
+    }
+
+    private fun startAudioRecording(): MediaRecorder {
+        return MediaRecorder().apply {
+            setAudioSource(MediaRecorder.AudioSource.MIC)
+            setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS)
+            setOutputFile(getAnswerAudioFile().absolutePath)
+            setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
+            prepare()
+            start()
         }
     }
 
@@ -306,7 +315,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val dailyTriggerTime = Calendar.getInstance().apply {
+        val dailyTriggerTime = getInstance().apply {
             set(HOUR_OF_DAY, 21)
             set(MINUTE, 0)
             set(SECOND, 0)
@@ -323,21 +332,6 @@ class MainActivity : AppCompatActivity() {
             AlarmManager.INTERVAL_DAY,
             pendingIntent
         )
-    }
-
-    private fun getAnswerAudioFile(): File {
-        return cacheDir.resolve("social_gateway_answer_audio.aac")
-    }
-
-    private fun startAudioRecording(): MediaRecorder {
-        return MediaRecorder().apply {
-            setAudioSource(MediaRecorder.AudioSource.MIC)
-            setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS)
-            setOutputFile(getAnswerAudioFile().absolutePath)
-            setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
-            prepare()
-            start()
-        }
     }
 
     override fun onPause() {
