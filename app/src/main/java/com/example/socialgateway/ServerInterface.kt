@@ -9,35 +9,39 @@ import java.net.URL
 import java.net.URLEncoder
 import java.util.*
 
+const val SERVER_URL_PATH = "https://hpi.de/baudisch/projects/neo4j/api"
 
 class ServerInterface {
     // TODO hide this key
     private val key = "hef3TF^Vg90546bvgFVL>Zzxskfou;aswperwrsf,c/x"
 
-    // TODO can I just close the connection?
-    private fun openConnection(route: String, arguments: String = ""): HttpURLConnection {
-        // why?
-        assert(!route.contains('?'))
-        // TODO save url separately
-        return URL("https://hpi.de/baudisch/projects/neo4j/api$route?key=$key&$arguments").openConnection() as HttpURLConnection
+    // TODO consider using JSON
+    private fun getFromServer(route: String, arguments: String = ""): String {
+        val connection =
+            URL("$SERVER_URL_PATH$route?key=$key&$arguments").openConnection() as HttpURLConnection
+        connection.disconnect()
+
+        if (connection.responseCode != HttpURLConnection.HTTP_OK)
+            throw ConnectException("GET response code ${connection.responseCode}")
+
+        return connection.inputStream.reader().readText()
     }
 
     private fun postToServer(data: ByteArray, route: String, arguments: String = "") {
         AsyncTask.execute {
-            openConnection(route, arguments).apply {
-                try {
-                    requestMethod = "POST"
-                    doOutput = true
-                    outputStream.write(data)
-                    if (responseCode != HttpURLConnection.HTTP_OK) {
-                        throw ConnectException("response code $responseCode")
-                    }
-                } catch (exception: ConnectException) {
-                    log("could not send answer: ${exception.message.orEmpty()}")
-                } finally {
-                    disconnect()
+            val connection =
+                (URL("$SERVER_URL_PATH$route?key=$key&$arguments").openConnection() as HttpURLConnection)
+
+            connection.apply {
+                requestMethod = "POST"
+                doOutput = true
+                outputStream.write(data)
+                if (responseCode != HttpURLConnection.HTTP_OK) {
+                    throw ConnectException("response code $responseCode")
                 }
             }
+
+            connection.disconnect()
         }
     }
 
@@ -45,17 +49,11 @@ class ServerInterface {
     fun getQuestion(socialAppName: String, questionType: String): String {
         val encodedAppName = URLEncoder.encode(socialAppName, "utf-8")
         val language = if (Locale.getDefault().language == "de") "german" else "english"
-        val questionConnection = ServerInterface().openConnection(
+
+        return ServerInterface().getFromServer(
             "/question",
             "app_name=$encodedAppName&language=$language&question_type=$questionType"
         )
-
-        questionConnection.disconnect()
-
-        if (questionConnection.responseCode != HttpURLConnection.HTTP_OK)
-            throw ConnectException("response code ${questionConnection.responseCode}")
-
-        return questionConnection.inputStream.reader().readText()
     }
 
     fun sendAnswer(
