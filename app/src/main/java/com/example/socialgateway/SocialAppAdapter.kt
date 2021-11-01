@@ -13,8 +13,7 @@ class SocialAppAdapter(
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val socialApp = SocialApps[position]
         val imageView = convertView as? ImageView ?: ImageView(context).apply {
-            // otherwise icons will be far from each other
-            adjustViewBounds = true
+            adjustViewBounds = true // otherwise icons will be far from each other
         }
 
         return imageView.apply {
@@ -28,7 +27,6 @@ class SocialAppAdapter(
     }
 
     override fun getItemId(position: Int): Long {
-        // why toLong()?
         return position.toLong()
     }
 

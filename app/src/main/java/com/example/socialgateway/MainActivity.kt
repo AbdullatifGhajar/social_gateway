@@ -36,12 +36,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var userId: String
     private lateinit var preferences: SharedPreferences
 
-    private fun requestQuestion(socialAppName: String, questionType: String = "normal"): String? {
+    private fun requestQuestion(socialApp: SocialApp, questionType: String = "normal"): String? {
         // make sure network request is not done on UI thread???
         assert(Looper.myLooper() != Looper.getMainLooper())
 
         try {
-            return ServerInterface().getQuestion(socialAppName, questionType)
+            return ServerInterface().getQuestion(socialApp, questionType)
         } catch (exception: Exception) {
             val errorMessage = resources.getString(
                 when (exception) {
@@ -79,9 +79,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun scheduleReflectionQuestion(socialAppName: String) {
+    private fun scheduleReflectionQuestion(socialApp: SocialApp) {
         AsyncTask.execute {
-            val question = requestQuestion(socialAppName, "reflection")
+            val question = requestQuestion(socialApp, "reflection")
                 ?: return@execute
 
             runOnUiThread {
@@ -89,7 +89,7 @@ class MainActivity : AppCompatActivity() {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     putExtra("intentCategory", IntentCategory.Reflection)
                     putExtra("question", question)
-                    putExtra("socialAppName", socialAppName)
+                    putExtra("socialAppName", socialApp.name)
                 }
                 val pendingIntent = PendingIntent.getActivity(
                     this,
@@ -193,7 +193,7 @@ class MainActivity : AppCompatActivity() {
                 )
 
                 if (socialApp != null) {
-                    scheduleReflectionQuestion(socialApp.name)
+                    scheduleReflectionQuestion(socialApp)
                     startApp(socialApp)
 
                     // track when the question was answered, so more questions are asked for this app today
@@ -218,9 +218,9 @@ class MainActivity : AppCompatActivity() {
 
     // check if the user was already asked a question for this app or two questions for any apps today
     private fun shouldReceiveQuestion(socialApp: SocialApp): Boolean {
-        return ((preferences.getString("lastQuestionDate", "") == today()
-                && preferences.getInt("questionsOnLastQuestionDate", 0) >= 2)
-                )
+        return (preferences.getString(socialApp.name, "") == today()
+                || (preferences.getString("lastQuestionDate", "") == today()
+                && preferences.getInt("questionsOnLastQuestionDate", 0) >= 2))
     }
 
     private fun isInstalled(socialApp: SocialApp): Boolean {
@@ -245,9 +245,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         AsyncTask.execute {
-            val question = requestQuestion(socialApp.name)
+            val question = requestQuestion(socialApp)
             if (question == null) {
-                scheduleReflectionQuestion(socialApp.name)
+                scheduleReflectionQuestion(socialApp)
                 startApp(socialApp)
             } else {
                 runOnUiThread {
