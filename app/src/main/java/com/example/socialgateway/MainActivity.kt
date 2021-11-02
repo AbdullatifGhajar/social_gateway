@@ -40,6 +40,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var userId: String
     private lateinit var preferences: SharedPreferences
+    private var recorder = "notRecording"
 
     private fun requestQuestion(socialApp: SocialApp, questionType: String = "normal"): String? {
         // make sure network request is not done on UI thread???
@@ -132,7 +133,7 @@ class MainActivity : AppCompatActivity() {
         val linearLayout = layoutInflater.inflate(R.layout.answer_dialog, null)
         val answerEditText = linearLayout.findViewById<EditText>(R.id.answer_edit_text)
         val answerRecordAudioButton =
-            linearLayout.findViewById<Button>(R.id.answer_record_audio_button)
+            linearLayout.findViewById<ImageButton>(R.id.answer_record_audio_button)
         var mediaRecorder: MediaRecorder? = null
 
         answerRecordAudioButton.setOnClickListener {
@@ -146,24 +147,24 @@ class MainActivity : AppCompatActivity() {
                     82
                 )
             } else {
-                // TODO refactor branching
-                when {
-                    // TODO don't rely on text
-                    answerRecordAudioButton.text == getString(R.string.delete_recording) -> {
+                when (recorder) {
+                    "hasRecorded" -> {
                         getAnswerAudioFile().delete()
-                        answerRecordAudioButton.text = getString(R.string.start_recording)
+                        recorder = "notRecording"
+                        answerRecordAudioButton.setImageResource(R.drawable.ic_start_recording);
                     }
-                    mediaRecorder == null -> {
-                        mediaRecorder = startAudioRecording()
-                        answerRecordAudioButton.text = getString(R.string.stop_recording)
+                    "notRecording" -> {
+                        recorder = "recording"
+                        answerRecordAudioButton.setImageResource(R.drawable.ic_stop_recording);
                     }
-                    else -> {
+                    "recording" -> {
                         mediaRecorder?.apply {
                             stop()
                             release()
                         }
                         mediaRecorder = null
-                        answerRecordAudioButton.text = getString(R.string.delete_recording)
+                        recorder = "hasRecorded"
+                        answerRecordAudioButton.setImageResource(R.drawable.ic_delete_recording);
                     }
                 }
             }

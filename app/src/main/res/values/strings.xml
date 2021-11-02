@@ -16,4 +16,5 @@
     <string name="check_in_question_value">When you think about how you used your smartphone today, how do you feel?</string>
     <string name="no_internet_connection_available">no internet connection available</string>
     <string name="unknown_error">unknown error</string>
+    <string name="voice_recorder">voice recorder</string>
 </resources>
