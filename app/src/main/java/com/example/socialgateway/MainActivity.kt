@@ -2,6 +2,7 @@ package com.example.socialgateway
 
 import android.Manifest
 import android.app.*
+import android.app.PendingIntent.*
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -27,6 +28,10 @@ const val channelId = "SocialGatewayChannelId"
 
 fun log(message: String) {
     Log.d("SocialGateway", message)
+}
+
+private fun today(): String {
+    return DateFormat.format("dd.MM.yyyy", Date()) as String
 }
 
 enum class IntentCategory { AskQuestion, Reflection, CheckIn }
@@ -91,11 +96,11 @@ class MainActivity : AppCompatActivity() {
                     putExtra("question", question)
                     putExtra("socialAppName", socialApp.name)
                 }
-                val pendingIntent = PendingIntent.getActivity(
+                val pendingIntent = getActivity(
                     this,
                     question.hashCode(),
                     intent,
-                    PendingIntent.FLAG_ONE_SHOT
+                    FLAG_ONE_SHOT
                 )
 
                 val builder = NotificationCompat.Builder(this, channelId)
@@ -120,16 +125,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun today(): String {
-        return DateFormat.format("dd.MM.yyyy", Date()) as String
-    }
-
     private fun showResponseDialog(
         question: String,
         socialApp: SocialApp?
     ) {
-        assert(question.isNotBlank())
-
         val linearLayout = layoutInflater.inflate(R.layout.answer_dialog, null)
         val answerEditText = linearLayout.findViewById<EditText>(R.id.answer_edit_text)
         val answerRecordAudioButton =
@@ -174,7 +173,6 @@ class MainActivity : AppCompatActivity() {
             setMessage(question)
             setView(linearLayout)
             setNegativeButton(android.R.string.cancel) { _, _ ->
-                finish()
             }
             setPositiveButton(android.R.string.ok) { _, _ ->
                 mediaRecorder?.apply {
@@ -193,7 +191,6 @@ class MainActivity : AppCompatActivity() {
                 )
 
                 if (socialApp != null) {
-                    scheduleReflectionQuestion(socialApp)
                     startApp(socialApp)
 
                     // track when the question was answered, so more questions are asked for this app today
@@ -227,33 +224,30 @@ class MainActivity : AppCompatActivity() {
         return packageManager.getLaunchIntentForPackage(socialApp.packageName) != null
     }
 
-    private fun askQuestion(socialApp: SocialApp) {
+    private fun chooseApp(socialApp: SocialApp) {
         if (!isInstalled(socialApp)) {
             resources.getString(R.string.X_was_not_found_on_your_device, socialApp.name).let {
                 Toast.makeText(this, it, Toast.LENGTH_LONG).show()
             }
-            // TODO don't load the whole activity. Use fragments instead
-            finish()
             return
         }
 
         // TODO KATIE should the app close this way?
-        if (!shouldReceiveQuestion(socialApp)) {
+        /* if (!shouldReceiveQuestion(socialApp)) {
             startApp(socialApp)
-            finish()
             return
-        }
+        } */
 
         AsyncTask.execute {
             val question = requestQuestion(socialApp)
-            if (question == null) {
-                scheduleReflectionQuestion(socialApp)
+            if (question == null || question.isBlank()) {
                 startApp(socialApp)
             } else {
                 runOnUiThread {
                     showResponseDialog(question, socialApp)
                 }
             }
+            scheduleReflectionQuestion(socialApp)
         }
     }
 
@@ -287,18 +281,15 @@ class MainActivity : AppCompatActivity() {
         log("userId: $userId")
 
         findViewById<GridView>(R.id.social_apps_grid).adapter =
-            SocialAppAdapter(this) { context, socialApp ->
-                startActivity(Intent(context, MainActivity::class.java).apply {
-                    putExtra("intentCategory", IntentCategory.AskQuestion)
-                    putExtra("socialAppName", socialApp.name)
-                })
+            SocialAppAdapter(this) { _, socialApp ->
+                chooseApp(socialApp)
             }
 
         intent?.extras?.let { intent ->
 
             when (intent.getSerializable("intentCategory") as? IntentCategory) {
                 IntentCategory.AskQuestion -> {
-                    askQuestion(
+                    chooseApp(
                         SocialApps.first { it.name == intent.getString("socialAppName") }
                     )
                 }
@@ -321,9 +312,9 @@ class MainActivity : AppCompatActivity() {
             set(SECOND, 0)
         }.timeInMillis
 
-        val pendingIntent = PendingIntent.getBroadcast(
+        val pendingIntent = getBroadcast(
             this, 346538746,
-            Intent(this, AlarmReceiver::class.java), PendingIntent.FLAG_UPDATE_CURRENT
+            Intent(this, AlarmReceiver::class.java), FLAG_UPDATE_CURRENT
         )
 
         alarmManager.setRepeating(

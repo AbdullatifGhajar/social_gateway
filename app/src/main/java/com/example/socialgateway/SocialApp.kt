@@ -6,7 +6,6 @@ class SocialApp(
     val imageId: Int
 )
 
-// TODO unify and beautify icons
 val SocialApps = listOf(
     SocialApp("Telegram", "org.telegram.messenger", R.drawable.telegram),
     SocialApp("WhatsApp", "com.whatsapp", R.drawable.whatsapp),
