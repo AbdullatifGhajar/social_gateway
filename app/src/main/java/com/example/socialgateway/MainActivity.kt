@@ -1,27 +1,22 @@
 package com.example.socialgateway
 
-import android.Manifest
 import android.app.*
 import android.app.PendingIntent.*
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
-import android.media.MediaRecorder
 import android.os.*
-import android.support.v4.app.ActivityCompat
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.NotificationManagerCompat
-import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.text.format.DateFormat
 import android.util.Log
 import android.widget.*
-import java.io.File
 import java.net.ConnectException
 import java.net.UnknownHostException
 import java.util.*
 import java.util.Calendar.*
+
 
 // TODO find a better place for these
 const val channelId = "SocialGatewayChannelId"
@@ -40,7 +35,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var userId: String
     private lateinit var preferences: SharedPreferences
-    private var recorder = "notRecording"
+    private lateinit var recorder: VoiceRecorder
 
     private fun requestQuestion(socialApp: SocialApp, questionType: String = "normal"): String? {
         // make sure network request is not done on UI thread???
@@ -133,41 +128,16 @@ class MainActivity : AppCompatActivity() {
         val linearLayout = layoutInflater.inflate(R.layout.answer_dialog, null)
         val answerEditText = linearLayout.findViewById<EditText>(R.id.answer_edit_text)
         val answerRecordAudioButton =
-            linearLayout.findViewById<ImageButton>(R.id.answer_record_audio_button)
-        var mediaRecorder: MediaRecorder? = null
+            linearLayout.findViewById<ImageButton>(R.id.record_button)
+        val recordingLayout = linearLayout.findViewById<LinearLayout>(R.id.record_layout)
+
+        recordingLayout.visibility = LinearLayout.GONE
+        recorder = VoiceRecorder(this, linearLayout)
 
         answerRecordAudioButton.setOnClickListener {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
-                != PackageManager.PERMISSION_GRANTED
-            ) {
-                // why 82? use other methods to request permissions
-                ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(Manifest.permission.RECORD_AUDIO),
-                    82
-                )
-            } else {
-                when (recorder) {
-                    "hasRecorded" -> {
-                        getAnswerAudioFile().delete()
-                        recorder = "notRecording"
-                        answerRecordAudioButton.setImageResource(R.drawable.ic_start_recording);
-                    }
-                    "notRecording" -> {
-                        recorder = "recording"
-                        answerRecordAudioButton.setImageResource(R.drawable.ic_stop_recording);
-                    }
-                    "recording" -> {
-                        mediaRecorder?.apply {
-                            stop()
-                            release()
-                        }
-                        mediaRecorder = null
-                        recorder = "hasRecorded"
-                        answerRecordAudioButton.setImageResource(R.drawable.ic_delete_recording);
-                    }
-                }
-            }
+            answerEditText.visibility = EditText.GONE
+            answerRecordAudioButton.visibility = ImageButton.GONE
+            recordingLayout.visibility = LinearLayout.VISIBLE
         }
 
         AlertDialog.Builder(this).apply {
@@ -176,10 +146,7 @@ class MainActivity : AppCompatActivity() {
             setNegativeButton(android.R.string.cancel) { _, _ ->
             }
             setPositiveButton(android.R.string.ok) { _, _ ->
-                mediaRecorder?.apply {
-                    stop()
-                    release()
-                }
+                // TODO stop recording or playing
 
                 // send the answer to the server and start the app
                 ServerInterface().sendAnswer(
@@ -188,7 +155,7 @@ class MainActivity : AppCompatActivity() {
                     userId,
                     question,
                     answerEditText.text.toString(),
-                    getAnswerAudioFile()
+                    recorder.getAnswerAudioFile()
                 )
 
                 if (socialApp != null) {
@@ -249,21 +216,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             scheduleReflectionQuestion(socialApp)
-        }
-    }
-
-    private fun getAnswerAudioFile(): File {
-        return cacheDir.resolve("social_gateway_answer_audio.aac")
-    }
-
-    private fun startAudioRecording(): MediaRecorder {
-        return MediaRecorder().apply {
-            setAudioSource(MediaRecorder.AudioSource.MIC)
-            setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS)
-            setOutputFile(getAnswerAudioFile().absolutePath)
-            setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
-            prepare()
-            start()
         }
     }
 
