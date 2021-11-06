@@ -13,6 +13,7 @@ val SocialApps = listOf(
     SocialApp("Twitter", "com.twitter.android", R.drawable.twitter),
     SocialApp("Discord", "com.discord", R.drawable.discord),
     SocialApp("Reddit", "com.reddit.frontpage", R.drawable.reddit),
+    SocialApp("Tumblr", "com.tumblr", R.drawable.tumblr),
     SocialApp("WhatsApp", "com.whatsapp", R.drawable.whatsapp),
     SocialApp("Facebook", "com.facebook.katana", R.drawable.facebook),
     SocialApp("Facebook Messenger", "com.facebook.orca", R.drawable.facebook_messenger),
