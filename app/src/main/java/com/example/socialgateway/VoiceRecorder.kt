@@ -1,12 +1,10 @@
 package com.example.socialgateway
 
-import android.Manifest
 import android.Manifest.permission.RECORD_AUDIO
 import android.app.Activity
 import android.content.pm.PackageManager
 import android.media.MediaPlayer
 import android.media.MediaRecorder
-import android.net.Uri
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.view.View
@@ -31,7 +29,8 @@ class VoiceRecorder(a: Activity, v: View) {
 
     private var mRecorder: MediaRecorder? = null
     private var mPlayer: MediaPlayer? = null
-    private var mFileName: String? = null
+
+    private var mFile = File.createTempFile("record", ".acc")
 
     init {
         startRecordingIB.setOnClickListener {
@@ -59,33 +58,40 @@ class VoiceRecorder(a: Activity, v: View) {
     }
 
     private fun startRecording() {
+        // log("before recording: " + mFile.length()/1024)
         if (hasPermissions()) {
-            mRecorder = MediaRecorder().apply {
-                setAudioSource(MediaRecorder.AudioSource.MIC)
-                setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS)
-                setOutputFile(getAnswerAudioFile().absolutePath)
-                setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
-                prepare()
-                start()
-            }
+            // TODO use scopes
+            mRecorder = MediaRecorder()
+            mRecorder!!.setAudioSource(MediaRecorder.AudioSource.MIC)
+            mRecorder!!.setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS)
+            mRecorder!!.setOutputFile(mFile.absolutePath)
+            mRecorder!!.setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
+            mRecorder!!.prepare()
+            mRecorder!!.start()
         } else {
             requestPermissions()
         }
     }
 
     private fun stopRecording() {
+        // TODO use scopes
         mRecorder?.stop()
         mRecorder?.release()
         mRecorder = null
+        // log("after recording: " + mFile.length()/1024)
     }
 
     private fun deletePlaying() {
-        getAnswerAudioFile().delete()
+        mFile.delete()
+        mFile = File.createTempFile("record", ".acc")
     }
 
     private fun startPlaying() {
-        mPlayer = MediaPlayer.create(activity, Uri.fromFile(getAnswerAudioFile()))
-        mPlayer?.start()
+        // TODO use scopes
+        mPlayer = MediaPlayer()
+        mPlayer!!.setDataSource(mFile.absolutePath);
+        mPlayer!!.prepare();
+        mPlayer!!.start()
     }
 
     private fun stopPlaying() {
@@ -97,14 +103,14 @@ class VoiceRecorder(a: Activity, v: View) {
         return ContextCompat.checkSelfPermission(
             activity,
             RECORD_AUDIO
-        ) != PackageManager.PERMISSION_GRANTED
+        ) == PackageManager.PERMISSION_GRANTED
     }
 
     private fun requestPermissions() {
         // why 82? use other methods to request permissions
         ActivityCompat.requestPermissions(
             activity,
-            arrayOf(Manifest.permission.RECORD_AUDIO),
+            arrayOf(RECORD_AUDIO),
             82
         )
     }
@@ -122,10 +128,6 @@ class VoiceRecorder(a: Activity, v: View) {
         stopPlayingIB.visibility =
             if (voiceRecorderState.stopPlaying) ImageButton.VISIBLE else ImageButton.GONE
     }
-
-    fun getAnswerAudioFile(): File {
-        return activity.cacheDir.resolve("social_gateway_answer_audio.aac")
-    }
 }
 
 data class VoiceRecorderState(
@@ -137,9 +139,39 @@ data class VoiceRecorderState(
 )
 
 val voiceRecorderStates = mapOf(
-    "initial" to VoiceRecorderState(true, false, false, false, false),
-    "recording" to VoiceRecorderState(false, true, false, false, false),
-    "recorded" to VoiceRecorderState(false, false, true, true, false),
-    "playing" to VoiceRecorderState(false, false, true, false, true),
-    "hideAll" to VoiceRecorderState(false, false, false, false, false)
+    "initial" to VoiceRecorderState(
+        startRecording = true,
+        stopRecording = false,
+        deleteRecording = false,
+        startPlaying = false,
+        stopPlaying = false
+    ),
+    "recording" to VoiceRecorderState(
+        startRecording = false,
+        stopRecording = true,
+        deleteRecording = false,
+        startPlaying = false,
+        stopPlaying = false
+    ),
+    "recorded" to VoiceRecorderState(
+        startRecording = false,
+        stopRecording = false,
+        deleteRecording = true,
+        startPlaying = true,
+        stopPlaying = false
+    ),
+    "playing" to VoiceRecorderState(
+        startRecording = false,
+        stopRecording = false,
+        deleteRecording = true,
+        startPlaying = false,
+        stopPlaying = true
+    ),
+    "hideAll" to VoiceRecorderState(
+        startRecording = false,
+        stopRecording = false,
+        deleteRecording = false,
+        startPlaying = false,
+        stopPlaying = false
+    )
 )
