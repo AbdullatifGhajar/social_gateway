@@ -126,21 +126,31 @@ class VoiceRecorder(a: Activity, v: View) {
     }
 
     private fun applyState() {
-        val voiceRecorderState = voiceRecorderStates[state] ?: throw Exception()
-        startRecordingIB.visibility =
-            if (voiceRecorderState.startRecording) ImageButton.VISIBLE else ImageButton.GONE
-        stopRecordingIB.visibility =
-            if (voiceRecorderState.stopRecording) ImageButton.VISIBLE else ImageButton.GONE
-        deleteRecordingIB.visibility =
-            if (voiceRecorderState.deleteRecording) ImageButton.VISIBLE else ImageButton.GONE
-        startPlayingIB.visibility =
-            if (voiceRecorderState.startPlaying) ImageButton.VISIBLE else ImageButton.GONE
-        stopPlayingIB.visibility =
-            if (voiceRecorderState.stopPlaying) ImageButton.VISIBLE else ImageButton.GONE
+        val recorderState = voiceRecorderStates[state] ?: throw Exception()
+        val buttonStates = mapOf<ImageButton, Boolean>(
+            startRecordingIB to recorderState.startRecording,
+            stopRecordingIB to recorderState.stopRecording,
+            deleteRecordingIB to recorderState.deleteRecording,
+            startPlayingIB to recorderState.startPlaying,
+            stopPlayingIB to recorderState.stopPlaying
+        )
+
+        for((button, active) in buttonStates)
+        {
+            if(!active) {
+                button.alpha = .5f
+                button.isClickable = false
+            }
+            else
+            {
+                button.alpha = 1f
+                button.isClickable = true
+            }
+        }
     }
 }
 
-data class VoiceRecorderState(
+data class RecorderState(
     val startRecording: Boolean,
     val stopRecording: Boolean,
     val deleteRecording: Boolean,
@@ -149,35 +159,35 @@ data class VoiceRecorderState(
 )
 
 val voiceRecorderStates = mapOf(
-    "initial" to VoiceRecorderState(
+    "initial" to RecorderState(
         startRecording = true,
         stopRecording = false,
         deleteRecording = false,
         startPlaying = false,
         stopPlaying = false
     ),
-    "recording" to VoiceRecorderState(
+    "recording" to RecorderState(
         startRecording = false,
         stopRecording = true,
         deleteRecording = false,
         startPlaying = false,
         stopPlaying = false
     ),
-    "recorded" to VoiceRecorderState(
+    "recorded" to RecorderState(
         startRecording = false,
         stopRecording = false,
         deleteRecording = true,
         startPlaying = true,
         stopPlaying = false
     ),
-    "playing" to VoiceRecorderState(
+    "playing" to RecorderState(
         startRecording = false,
         stopRecording = false,
         deleteRecording = true,
         startPlaying = false,
         stopPlaying = true
     ),
-    "hideAll" to VoiceRecorderState(
+    "hideAll" to RecorderState(
         startRecording = false,
         stopRecording = false,
         deleteRecording = false,
