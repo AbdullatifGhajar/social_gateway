@@ -30,7 +30,14 @@ class VoiceRecorder(a: Activity, v: View) {
     private var mRecorder: MediaRecorder? = null
     private var mPlayer: MediaPlayer? = null
 
-    private var mFile = File.createTempFile("record", ".acc")
+    private var mFile: File? = null
+
+    fun recordingFile(): File{
+        if(mFile == null)
+            mFile = File.createTempFile("record", ".3gp")
+        return mFile!!
+    }
+
 
     init {
         startRecordingIB.setOnClickListener {
@@ -60,38 +67,41 @@ class VoiceRecorder(a: Activity, v: View) {
     private fun startRecording() {
         // log("before recording: " + mFile.length()/1024)
         if (hasPermissions()) {
-            // TODO use scopes
-            mRecorder = MediaRecorder()
-            mRecorder!!.setAudioSource(MediaRecorder.AudioSource.MIC)
-            mRecorder!!.setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS)
-            mRecorder!!.setOutputFile(mFile.absolutePath)
-            mRecorder!!.setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
-            mRecorder!!.prepare()
-            mRecorder!!.start()
+            mRecorder = MediaRecorder().apply{
+                setAudioSource(MediaRecorder.AudioSource.MIC)
+                setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
+                setOutputFile(recordingFile().absolutePath)
+                setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
+                prepare()
+                start()
+            }
         } else {
             requestPermissions()
         }
     }
 
     private fun stopRecording() {
-        // TODO use scopes
-        mRecorder?.stop()
-        mRecorder?.release()
+        mRecorder?.run {
+            stop()
+            release()
+        }
         mRecorder = null
         // log("after recording: " + mFile.length()/1024)
     }
 
     private fun deletePlaying() {
-        mFile.delete()
-        mFile = File.createTempFile("record", ".acc")
+        stopRecording()
+        stopPlaying()
+        mFile?.delete()
+        mFile = null
     }
 
     private fun startPlaying() {
-        // TODO use scopes
-        mPlayer = MediaPlayer()
-        mPlayer!!.setDataSource(mFile.absolutePath);
-        mPlayer!!.prepare();
-        mPlayer!!.start()
+        mPlayer = MediaPlayer().apply {
+            setDataSource(recordingFile().absolutePath)
+            prepare()
+            start()
+        }
     }
 
     private fun stopPlaying() {

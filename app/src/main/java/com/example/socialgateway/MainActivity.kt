@@ -155,7 +155,7 @@ class MainActivity : AppCompatActivity() {
                     userId,
                     question,
                     answerEditText.text.toString(),
-                    recorder.getAnswerAudioFile()
+                    recorder.recordingFile()
                 )
 
                 if (socialApp != null) {
