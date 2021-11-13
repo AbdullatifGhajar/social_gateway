@@ -5,82 +5,114 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <EditText
-        android:id="@+id/answer_edit_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:hint="@string/type_answer_here_or_record_audio"
-        android:inputType="text"
-        android:minHeight="48dp"
-        android:textColorHint="#546E7A"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageButton
-        android:id="@+id/record_button"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:background="@android:color/transparent"
-        android:contentDescription="@string/voice_recorder"
-        android:src="@drawable/ic_voice_recorder"
-        app:layout_constraintEnd_toStartOf="@+id/answer_edit_text"
-        app:layout_constraintHorizontal_bias="0.423"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <LinearLayout
-        android:id="@+id/record_layout"
-        android:layout_width="409dp"
+        android:id="@+id/typing_layout"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/answer_edit_text">
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageButton
-            android:id="@+id/start_recording_button"
+            android:id="@+id/record_button"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:background="@android:color/transparent"
             android:contentDescription="@string/voice_recorder"
-            android:src="@drawable/ic_start_recording" />
+            android:src="@drawable/ic_voice_recorder"
+            app:layout_constraintEnd_toStartOf="@+id/answer_edit_text"
+            app:layout_constraintHorizontal_bias="0.423"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/answer_edit_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:hint="@string/type_answer_here_or_record_audio"
+            android:inputType="text"
+            android:minHeight="48dp"
+            android:textColorHint="#546E7A"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/recording_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageButton
-            android:id="@+id/stop_recording_button"
+            android:id="@+id/text_button"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:background="@android:color/transparent"
             android:contentDescription="@string/voice_recorder"
-            android:src="@drawable/ic_stop_recording" />
+            android:src="@drawable/ic_text_input" />
 
-        <ImageButton
-            android:id="@+id/delete_recording_button"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/voice_recorder"
-            android:src="@drawable/ic_delete_recording" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/answer_edit_text">
 
-        <ImageButton
-            android:id="@+id/start_playing_button"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/voice_recorder"
-            android:src="@drawable/ic_start_playing" />
+            <ImageButton
+                android:id="@+id/start_recording_button"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/voice_recorder"
+                android:src="@drawable/ic_start_recording" />
 
-        <ImageButton
-            android:id="@+id/stop_playing_button"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/voice_recorder"
-            android:src="@drawable/ic_stop_recording" />
+            <ImageButton
+                android:id="@+id/stop_recording_button"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/voice_recorder"
+                android:src="@drawable/ic_stop_recording" />
+
+            <ImageButton
+                android:id="@+id/delete_recording_button"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/voice_recorder"
+                android:src="@drawable/ic_delete_recording" />
+
+            <ImageButton
+                android:id="@+id/start_playing_button"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/voice_recorder"
+                android:src="@drawable/ic_start_playing" />
+
+            <ImageButton
+                android:id="@+id/stop_playing_button"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/voice_recorder"
+                android:src="@drawable/ic_stop_recording" />
 
 
+        </LinearLayout>
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

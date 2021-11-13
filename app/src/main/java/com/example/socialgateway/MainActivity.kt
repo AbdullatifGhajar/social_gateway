@@ -126,19 +126,22 @@ class MainActivity : AppCompatActivity() {
         socialApp: SocialApp?
     ) {
         val linearLayout = layoutInflater.inflate(R.layout.answer_dialog, null)
-        val answerEditText = linearLayout.findViewById<EditText>(R.id.answer_edit_text)
-        val answerRecordAudioButton =
-            linearLayout.findViewById<ImageButton>(R.id.record_button)
-        val recordingLayout = linearLayout.findViewById<LinearLayout>(R.id.record_layout)
+        val recordingLayout = linearLayout.findViewById<LinearLayout>(R.id.recording_layout)
+        val typingLayout = linearLayout.findViewById<LinearLayout>(R.id.typing_layout)
 
         recordingLayout.visibility = LinearLayout.GONE
         recorder = VoiceRecorder(this, linearLayout)
 
-        answerRecordAudioButton.setOnClickListener {
-            answerEditText.visibility = EditText.GONE
-            answerRecordAudioButton.visibility = ImageButton.GONE
+        linearLayout.findViewById<ImageButton>(R.id.record_button).setOnClickListener {
+            typingLayout.visibility = EditText.GONE
             recordingLayout.visibility = LinearLayout.VISIBLE
         }
+
+        linearLayout.findViewById<ImageButton>(R.id.text_button).setOnClickListener {
+            typingLayout.visibility = EditText.VISIBLE
+            recordingLayout.visibility = LinearLayout.INVISIBLE
+        }
+
 
         AlertDialog.Builder(this).apply {
             setMessage(question)
@@ -154,7 +157,7 @@ class MainActivity : AppCompatActivity() {
                     socialApp?.name ?: "check-in",
                     userId,
                     question,
-                    answerEditText.text.toString(),
+                    linearLayout.findViewById<TextView>(R.id.answer_edit_text).text.toString(),
                     recorder.recordingFile()
                 )
 
