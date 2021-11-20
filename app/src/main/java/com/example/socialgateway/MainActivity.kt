@@ -16,7 +16,12 @@ import android.os.Looper
 import android.support.v7.app.AppCompatActivity
 import android.text.format.DateFormat
 import android.util.Log
-import android.widget.*
+import android.view.View
+import android.view.ViewGroup
+import android.widget.GridView
+import android.widget.ImageButton
+import android.widget.TextView
+import android.widget.Toast
 import java.net.ConnectException
 import java.net.UnknownHostException
 import java.util.*
@@ -89,61 +94,58 @@ class MainActivity : AppCompatActivity() {
         prompt: Prompt,
         socialApp: SocialApp?
     ) {
-        val linearLayout = layoutInflater.inflate(R.layout.answer_dialog, null)
-        val recordingLayout = linearLayout.findViewById<LinearLayout>(R.id.recording_layout)
-        val typingLayout = linearLayout.findViewById<LinearLayout>(R.id.typing_layout)
+        val typingLayout = layoutInflater.inflate(R.layout.typing_dialog, null)
+        val recordingLayout = layoutInflater.inflate(R.layout.recording_dialog, null)
 
-        recordingLayout.visibility = LinearLayout.GONE
+        recorder = VoiceRecorder(this, recordingLayout)
 
-        // TODO remove the two if statements (here and below)
-        if (prompt.answerable) {
-            recorder = VoiceRecorder(this, linearLayout)
-
-            linearLayout.findViewById<ImageButton>(R.id.record_button).setOnClickListener {
-                typingLayout.visibility = EditText.GONE
-                recordingLayout.visibility = LinearLayout.VISIBLE
-            }
-
-            linearLayout.findViewById<ImageButton>(R.id.text_button).setOnClickListener {
-                typingLayout.visibility = EditText.VISIBLE
-                recordingLayout.visibility = LinearLayout.INVISIBLE
-            }
-        } else {
-            typingLayout.visibility = LinearLayout.GONE
-        }
-
-        AlertDialog.Builder(this).apply {
-            setMessage(prompt.content)
-            setView(linearLayout)
-            setNegativeButton(android.R.string.cancel) { _, _ ->
-            }
-            setPositiveButton(android.R.string.ok) { _, _ ->
-                // TODO stop recording or playing
-                if (prompt.answerable) {
-                    // send the answer to the server and start the app
-                    ServerInterface().sendAnswer(
-                        // TODO KATIE how should check-in work
-                        socialApp?.name ?: "check-in",
-                        userId,
-                        prompt.content,
-                        linearLayout.findViewById<TextView>(R.id.answer_edit_text).text.toString(),
-                        recorder.recordingFile()
-                    )
+        fun dialogWithLayout(layout: View?): AlertDialog {
+            return AlertDialog.Builder(this).apply {
+                setMessage(prompt.content)
+                setView(layout)
+                setNegativeButton(android.R.string.cancel) { _, _ ->
                 }
+                setPositiveButton(android.R.string.ok) { _, _ ->
+                    // TODO stop recording or playing
+                    if (prompt.answerable) {
+                        ServerInterface().sendAnswer(
+                            // TODO KATIE how should check-in work
+                            socialApp?.name ?: "check-in",
+                            userId,
+                            prompt.content,
+                            typingLayout.findViewById<TextView>(R.id.answer_edit_text).text.toString(),
+                            recorder.recordingFile()
+                        )
+                    }
 
-                if (socialApp != null) {
-                    startApp(socialApp)
-
-                    // track when the question was answered, so more questions are asked for this app today
-                    preferences.edit().apply {
-                        putString("last_prompt:${socialApp.name}", today())
-                        putString("lastQuestionDate", today())
-                        apply()
+                    if (socialApp != null) {
+                        startApp(socialApp)
+                        // track when the question was answered, so more questions are asked for this app today
+                        preferences.edit().apply {
+                            putString("last_prompt:${socialApp.name}", today())
+                            putString("lastQuestionDate", today())
+                            apply()
+                        }
                     }
                 }
+            }.create().apply {
+                show()
             }
-            create()
-            show()
+        }
+
+        var dialog = dialogWithLayout(if (prompt.answerable) typingLayout else null)
+
+        typingLayout.findViewById<ImageButton>(R.id.record_button).setOnClickListener {
+            dialog.dismiss()
+            if (recordingLayout.parent != null)
+                (recordingLayout.parent as ViewGroup).removeView(recordingLayout)
+            dialog = dialogWithLayout(recordingLayout)
+        }
+        recordingLayout.findViewById<ImageButton>(R.id.text_button).setOnClickListener {
+            dialog.dismiss()
+            if (recordingLayout.parent != null)
+                (typingLayout.parent as ViewGroup).removeView(typingLayout)
+            dialog = dialogWithLayout(typingLayout)
         }
     }
 
