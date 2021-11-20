@@ -15,8 +15,7 @@ class ServerInterface {
     // TODO hide this key
     private val key = "hef3TF^Vg90546bvgFVL>Zzxskfou;aswperwrsf,c/x"
 
-    // TODO consider using JSON
-    private fun getFromServer(route: String, arguments: String = ""): String {
+    private fun getFromServer(route: String, arguments: String = ""): JSONObject {
         val connection =
             URL("$SERVER_URL_PATH$route?key=$key&$arguments").openConnection() as HttpURLConnection
         connection.disconnect()
@@ -24,7 +23,7 @@ class ServerInterface {
         if (connection.responseCode != HttpURLConnection.HTTP_OK)
             throw ConnectException("GET response code ${connection.responseCode}")
 
-        return connection.inputStream.reader().readText()
+        return JSONObject(connection.inputStream.reader().readText())
     }
 
     private fun postToServer(data: ByteArray, route: String, arguments: String = "") {
@@ -45,13 +44,18 @@ class ServerInterface {
         }
     }
 
-    fun getQuestion(socialApp: SocialApp, questionType: String): String {
+    fun getPrompt(socialApp: SocialApp, questionType: String): Prompt {
         val encodedAppName = URLEncoder.encode(socialApp.name, "utf-8")
         val language = if (Locale.getDefault().language == "de") "german" else "english"
 
-        return ServerInterface().getFromServer(
-            "/question",
-            "app_name=$encodedAppName&language=$language&question_type=$questionType"
+        val responseJson = ServerInterface().getFromServer(
+            "/prompt",
+            "app_name=$encodedAppName&language=$language&prompt_type=$questionType"
+        )
+
+        return Prompt(
+            responseJson.getString("content"),
+            responseJson.getBoolean("answerable")
         )
     }
 

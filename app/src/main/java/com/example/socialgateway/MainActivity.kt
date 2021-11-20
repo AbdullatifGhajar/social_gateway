@@ -1,13 +1,18 @@
 package com.example.socialgateway
 
-import android.app.*
-import android.app.PendingIntent.*
+import android.app.AlarmManager
+import android.app.AlertDialog
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent.FLAG_UPDATE_CURRENT
+import android.app.PendingIntent.getBroadcast
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.os.*
-import android.support.v4.app.NotificationCompat
-import android.support.v4.app.NotificationManagerCompat
+import android.os.AsyncTask
+import android.os.Build
+import android.os.Bundle
+import android.os.Looper
 import android.support.v7.app.AppCompatActivity
 import android.text.format.DateFormat
 import android.util.Log
@@ -18,7 +23,7 @@ import java.util.*
 import java.util.Calendar.*
 
 
-// TODO find a better place for these
+// TODO: find a better place for these
 const val channelId = "SocialGatewayChannelId"
 
 fun log(message: String) {
@@ -37,12 +42,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var preferences: SharedPreferences
     private lateinit var recorder: VoiceRecorder
 
-    private fun requestQuestion(socialApp: SocialApp, questionType: String = "normal"): String? {
+    private fun requestPrompt(socialApp: SocialApp, promptType: String = "normal"): Prompt? {
         // make sure network request is not done on UI thread???
         assert(Looper.myLooper() != Looper.getMainLooper())
 
         try {
-            return ServerInterface().getQuestion(socialApp, questionType)
+            return ServerInterface().getPrompt(socialApp, promptType)
         } catch (exception: Exception) {
             val errorMessage = resources.getString(
                 when (exception) {
@@ -58,7 +63,7 @@ class MainActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
             }
-            log("could not request question: ${exception.message.orEmpty()}")
+            log("could not request prompt: ${exception.message.orEmpty()}")
         }
         return null
     }
@@ -80,49 +85,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun scheduleReflectionQuestion(socialApp: SocialApp) {
-        AsyncTask.execute {
-            val question = requestQuestion(socialApp, "reflection")
-                ?: return@execute
-
-            runOnUiThread {
-                val intent = Intent(this, MainActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    putExtra("intentCategory", IntentCategory.Reflection)
-                    putExtra("question", question)
-                    putExtra("socialAppName", socialApp.name)
-                }
-                val pendingIntent = getActivity(
-                    this,
-                    question.hashCode(),
-                    intent,
-                    FLAG_ONE_SHOT
-                )
-
-                val builder = NotificationCompat.Builder(this, channelId)
-                    // TODO change icon
-                    .setSmallIcon(R.drawable.placeholder)
-                    .setContentTitle(getString(R.string.reflection_question))
-                    .setContentText(question)
-                    .setStyle(NotificationCompat.BigTextStyle().bigText(question))
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                    .setContentIntent(pendingIntent)
-                    .setAutoCancel(true)
-
-                // show the reflection question notification with some minutes delay
-                val minutes = 10
-                Handler().postDelayed({
-                    // notificationId is a unique int for each notification that you must define
-                    val notificationId = System.currentTimeMillis() % Int.MAX_VALUE
-                    NotificationManagerCompat.from(this)
-                        .notify(notificationId.toInt(), builder.build())
-                }, (minutes * 60 * 1000).toLong())
-            }
-        }
-    }
-
     private fun showResponseDialog(
-        question: String,
+        prompt: Prompt,
         socialApp: SocialApp?
     ) {
         val linearLayout = layoutInflater.inflate(R.layout.answer_dialog, null)
@@ -130,47 +94,50 @@ class MainActivity : AppCompatActivity() {
         val typingLayout = linearLayout.findViewById<LinearLayout>(R.id.typing_layout)
 
         recordingLayout.visibility = LinearLayout.GONE
-        recorder = VoiceRecorder(this, linearLayout)
 
-        linearLayout.findViewById<ImageButton>(R.id.record_button).setOnClickListener {
-            typingLayout.visibility = EditText.GONE
-            recordingLayout.visibility = LinearLayout.VISIBLE
+        // TODO remove the two if statements (here and below)
+        if (prompt.answerable) {
+            recorder = VoiceRecorder(this, linearLayout)
+
+            linearLayout.findViewById<ImageButton>(R.id.record_button).setOnClickListener {
+                typingLayout.visibility = EditText.GONE
+                recordingLayout.visibility = LinearLayout.VISIBLE
+            }
+
+            linearLayout.findViewById<ImageButton>(R.id.text_button).setOnClickListener {
+                typingLayout.visibility = EditText.VISIBLE
+                recordingLayout.visibility = LinearLayout.INVISIBLE
+            }
+        } else {
+            typingLayout.visibility = LinearLayout.GONE
         }
-
-        linearLayout.findViewById<ImageButton>(R.id.text_button).setOnClickListener {
-            typingLayout.visibility = EditText.VISIBLE
-            recordingLayout.visibility = LinearLayout.INVISIBLE
-        }
-
 
         AlertDialog.Builder(this).apply {
-            setMessage(question)
+            setMessage(prompt.content)
             setView(linearLayout)
             setNegativeButton(android.R.string.cancel) { _, _ ->
             }
             setPositiveButton(android.R.string.ok) { _, _ ->
                 // TODO stop recording or playing
-
-                // send the answer to the server and start the app
-                ServerInterface().sendAnswer(
-                    // TODO KATIE how should check-in work
-                    socialApp?.name ?: "check-in",
-                    userId,
-                    question,
-                    linearLayout.findViewById<TextView>(R.id.answer_edit_text).text.toString(),
-                    recorder.recordingFile()
-                )
+                if (prompt.answerable) {
+                    // send the answer to the server and start the app
+                    ServerInterface().sendAnswer(
+                        // TODO KATIE how should check-in work
+                        socialApp?.name ?: "check-in",
+                        userId,
+                        prompt.content,
+                        linearLayout.findViewById<TextView>(R.id.answer_edit_text).text.toString(),
+                        recorder.recordingFile()
+                    )
+                }
 
                 if (socialApp != null) {
                     startApp(socialApp)
 
                     // track when the question was answered, so more questions are asked for this app today
                     preferences.edit().apply {
-                        putString(socialApp.name, today())
+                        putString("last_prompt:${socialApp.name}", today())
                         putString("lastQuestionDate", today())
-                        val questionsOnLastQuestionDate =
-                            preferences.getInt("questionsOnLastQuestionDate", 0)
-                        putInt("questionsOnLastQuestionDate", questionsOnLastQuestionDate + 1)
                         apply()
                     }
                 }
@@ -184,11 +151,9 @@ class MainActivity : AppCompatActivity() {
         startActivity(packageManager.getLaunchIntentForPackage(socialApp.packageName))
     }
 
-    // check if the user was already asked a question for this app or two questions for any apps today
-    private fun shouldReceiveQuestion(socialApp: SocialApp): Boolean {
-        return (preferences.getString(socialApp.name, "") == today()
-                || (preferences.getString("lastQuestionDate", "") == today()
-                && preferences.getInt("questionsOnLastQuestionDate", 0) >= 2))
+    // check if the user was already asked a question for this app
+    private fun shouldReceivePrompt(socialApp: SocialApp): Boolean {
+        return (preferences.getString("last_prompt:${socialApp.name}", "") != today())
     }
 
     private fun isInstalled(socialApp: SocialApp): Boolean {
@@ -203,27 +168,27 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        // TODO KATIE should the app close this way?
+        // TODO: KATIE should the app close this way?
         /* if (!shouldReceiveQuestion(socialApp)) {
             startApp(socialApp)
             return
         } */
 
         AsyncTask.execute {
-            val question = requestQuestion(socialApp)
-            if (question == null || question.isBlank()) {
+            val prompt = requestPrompt(socialApp)
+            if (prompt == null) {
                 startApp(socialApp)
             } else {
                 runOnUiThread {
-                    showResponseDialog(question, socialApp)
+                    showResponseDialog(prompt, socialApp)
                 }
             }
-            scheduleReflectionQuestion(socialApp)
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.social_apps_grid)
 
         createNotificationChannel()
@@ -250,13 +215,12 @@ class MainActivity : AppCompatActivity() {
                     )
                 }
                 IntentCategory.Reflection -> {
-                    showResponseDialog(
-                        intent.getString("question").orEmpty(),
-                        SocialApps.first { it.name == intent.getString("socialAppName") }
-                    )
+                    // TODO take a look at this
+                    val prompt = Prompt(intent.getString("question").orEmpty(), true)
+                    showResponseDialog(prompt, null)
                 }
-                IntentCategory.CheckIn -> {
-                    showResponseDialog(intent.getString("question").orEmpty(), null)
+                else -> {
+                    // do nothing
                 }
             }
         }
@@ -268,6 +232,7 @@ class MainActivity : AppCompatActivity() {
             set(SECOND, 0)
         }.timeInMillis
 
+        // TODO: add question to it
         val pendingIntent = getBroadcast(
             this, 346538746,
             Intent(this, AlarmReceiver::class.java), FLAG_UPDATE_CURRENT
@@ -282,6 +247,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onPause() {
+        // TODO: why?
         super.onPause()
         preferences.edit().apply {
             putString("userId", userId)
@@ -289,3 +255,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
+
+// TODO:
+//  - reflection only at 9pm
+//  - brainstorm name
+//  - refactor question to prompt
+//  - server returns prompt body and isQuestion
+
