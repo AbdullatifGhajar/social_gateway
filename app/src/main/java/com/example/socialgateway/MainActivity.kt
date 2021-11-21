@@ -27,10 +27,6 @@ import java.net.UnknownHostException
 import java.util.*
 import java.util.Calendar.*
 
-
-// TODO: find a better place for these
-const val channelId = "SocialGatewayChannelId"
-
 fun log(message: String) {
     Log.d("SocialGateway", message)
 }
@@ -52,7 +48,7 @@ class MainActivity : AppCompatActivity() {
         assert(Looper.myLooper() != Looper.getMainLooper())
 
         try {
-            return ServerInterface(this).getPrompt(socialApp, promptType)
+            return ServerInterface().getPrompt(socialApp, promptType)
         } catch (exception: Exception) {
             val errorMessage = resources.getString(
                 when (exception) {
@@ -80,7 +76,7 @@ class MainActivity : AppCompatActivity() {
             val name = getString(R.string.channel_name)
             val descriptionText = getString(R.string.channel_description)
             val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(channelId, name, importance).apply {
+            val channel = NotificationChannel(getString(R.string.notificationChannelId), name, importance).apply {
                 description = descriptionText
             }
             // Register the channel with the system
@@ -108,7 +104,7 @@ class MainActivity : AppCompatActivity() {
                 setPositiveButton(android.R.string.ok) { _, _ ->
                     // TODO stop recording or playing
                     if (prompt.answerable) {
-                        ServerInterface(this@MainActivity).sendAnswer(
+                        ServerInterface().sendAnswer(
                             // TODO KATIE how should check-in work
                             socialApp?.name ?: "check-in",
                             userId,

@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name" translatable="false">SocialGateway</string>
+    <string name="notificationChannelId" translatable="false">SocialGatewayChannelId</string>
+    <string name="serverUrlPath" translatable="false">https://hpi.de/baudisch/projects/neo4j/api</string>
 
     <string name="X_was_not_found_on_your_device">%1$s was not found on your device</string>
     <string name="start_recording">start recording</string>

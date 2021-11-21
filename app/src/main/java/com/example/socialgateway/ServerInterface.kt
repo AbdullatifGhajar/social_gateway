@@ -1,6 +1,7 @@
 package com.example.socialgateway
 
 import android.content.Context
+import android.content.res.Resources
 import android.os.AsyncTask
 import org.json.JSONObject
 import java.io.File
@@ -10,14 +11,13 @@ import java.net.URL
 import java.net.URLEncoder
 import java.util.*
 
-const val SERVER_URL_PATH = "https://hpi.de/baudisch/projects/neo4j/api"
+val key: String = Resources.getSystem().getString(R.string.KEY)
+val serverUrlPath: String = Resources.getSystem().getString(R.string.serverUrlPath)
 
-class ServerInterface (context: Context){
-    private val key = context.resources.getString(R.string.KEY)
-
+class ServerInterface (){
     private fun getFromServer(route: String, arguments: String = ""): JSONObject {
         val connection =
-            URL("$SERVER_URL_PATH$route?key=$key&$arguments").openConnection() as HttpURLConnection
+            URL("$serverUrlPath$route?key=$key&$arguments").openConnection() as HttpURLConnection
         connection.disconnect()
 
         if (connection.responseCode != HttpURLConnection.HTTP_OK)
@@ -29,7 +29,7 @@ class ServerInterface (context: Context){
     private fun postToServer(data: ByteArray, route: String, arguments: String = "") {
         AsyncTask.execute {
             val connection =
-                (URL("$SERVER_URL_PATH$route?key=$key&$arguments").openConnection() as HttpURLConnection)
+                (URL("$serverUrlPath$route?key=$key&$arguments").openConnection() as HttpURLConnection)
 
             connection.apply {
                 requestMethod = "POST"
