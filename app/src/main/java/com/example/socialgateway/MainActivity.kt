@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity() {
         assert(Looper.myLooper() != Looper.getMainLooper())
 
         try {
-            return ServerInterface().getPrompt(socialApp, promptType)
+            return ServerInterface(this).getPrompt(socialApp, promptType)
         } catch (exception: Exception) {
             val errorMessage = resources.getString(
                 when (exception) {
@@ -108,7 +108,7 @@ class MainActivity : AppCompatActivity() {
                 setPositiveButton(android.R.string.ok) { _, _ ->
                     // TODO stop recording or playing
                     if (prompt.answerable) {
-                        ServerInterface().sendAnswer(
+                        ServerInterface(this@MainActivity).sendAnswer(
                             // TODO KATIE how should check-in work
                             socialApp?.name ?: "check-in",
                             userId,

@@ -1,5 +1,6 @@
 package com.example.socialgateway
 
+import android.content.Context
 import android.os.AsyncTask
 import org.json.JSONObject
 import java.io.File
@@ -11,9 +12,8 @@ import java.util.*
 
 const val SERVER_URL_PATH = "https://hpi.de/baudisch/projects/neo4j/api"
 
-class ServerInterface {
-    // TODO hide this key
-    private val key = "hef3TF^Vg90546bvgFVL>Zzxskfou;aswperwrsf,c/x"
+class ServerInterface (context: Context){
+    private val key = context.resources.getString(R.string.KEY)
 
     private fun getFromServer(route: String, arguments: String = ""): JSONObject {
         val connection =
@@ -48,7 +48,7 @@ class ServerInterface {
         val encodedAppName = URLEncoder.encode(socialApp.name, "utf-8")
         val language = if (Locale.getDefault().language == "de") "german" else "english"
 
-        val responseJson = ServerInterface().getFromServer(
+        val responseJson = getFromServer(
             "/prompt",
             "app_name=$encodedAppName&language=$language&prompt_type=$promptType"
         )
