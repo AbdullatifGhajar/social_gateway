@@ -125,6 +125,11 @@ class VoiceRecorder(a: Activity, v: View) {
         )
     }
 
+    public fun stop(){
+        stopRecording()
+        stopPlaying()
+    }
+
     private fun applyState() {
         val recorderState = voiceRecorderStates[state] ?: throw Exception()
         val buttonStates = mapOf<ImageButton, Boolean>(

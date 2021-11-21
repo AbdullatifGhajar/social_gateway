@@ -112,6 +112,7 @@ class MainActivity : AppCompatActivity() {
                             typingLayout.findViewById<TextView>(R.id.answer_edit_text).text.toString(),
                             recorder.recordingFile()
                         )
+                        recorder.stop()
                     }
 
                     if (socialApp != null) {
@@ -139,6 +140,7 @@ class MainActivity : AppCompatActivity() {
         }
         recordingLayout.findViewById<ImageButton>(R.id.text_button).setOnClickListener {
             dialog.dismiss()
+            recorder.stop()
             if (recordingLayout.parent != null)
                 (typingLayout.parent as ViewGroup).removeView(typingLayout)
             dialog = dialogWithLayout(typingLayout)
