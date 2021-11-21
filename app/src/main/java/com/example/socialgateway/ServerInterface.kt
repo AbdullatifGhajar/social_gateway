@@ -44,13 +44,13 @@ class ServerInterface {
         }
     }
 
-    fun getPrompt(socialApp: SocialApp, questionType: String): Prompt {
+    fun getPrompt(socialApp: SocialApp, promptType: String): Prompt {
         val encodedAppName = URLEncoder.encode(socialApp.name, "utf-8")
         val language = if (Locale.getDefault().language == "de") "german" else "english"
 
         val responseJson = ServerInterface().getFromServer(
             "/prompt",
-            "app_name=$encodedAppName&language=$language&prompt_type=$questionType"
+            "app_name=$encodedAppName&language=$language&prompt_type=$promptType"
         )
 
         return Prompt(
@@ -62,7 +62,7 @@ class ServerInterface {
     fun sendAnswer(
         appName: String,
         userId: String,
-        question: String,
+        prompt: String,
         answerText: String,
         audio: File
     ) {
@@ -81,7 +81,7 @@ class ServerInterface {
                 """{
             "user_id": "$userId",
             "app_name": "$appName",
-            "question": "$question",
+            "prompt": "$prompt",
             "answer_text": "$answerText",
             "answer_audio_uuid": "$answerAudioUuid"
         }"""

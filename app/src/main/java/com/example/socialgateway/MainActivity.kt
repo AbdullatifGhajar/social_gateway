@@ -120,10 +120,10 @@ class MainActivity : AppCompatActivity() {
 
                     if (socialApp != null) {
                         startApp(socialApp)
-                        // track when the question was answered, so more questions are asked for this app today
+                        // log this for shouldReceivePrompt later
                         preferences.edit().apply {
                             putString("last_prompt:${socialApp.name}", today())
-                            putString("lastQuestionDate", today())
+                            putString("lastPromptDate", today())
                             apply()
                         }
                     }
@@ -153,7 +153,7 @@ class MainActivity : AppCompatActivity() {
         startActivity(packageManager.getLaunchIntentForPackage(socialApp.packageName))
     }
 
-    // check if the user was already asked a question for this app
+    // check if the user already a prompt for this app today
     private fun shouldReceivePrompt(socialApp: SocialApp): Boolean {
         return (preferences.getString("last_prompt:${socialApp.name}", "") != today())
     }
@@ -170,8 +170,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        // TODO: KATIE should the app close this way?
-        /* if (!shouldReceiveQuestion(socialApp)) {
+        /* if (!shouldReceivePromptToday(socialApp)) {
             startApp(socialApp)
             return
         } */
@@ -217,7 +216,6 @@ class MainActivity : AppCompatActivity() {
                     )
                 }
                 IntentCategory.Reflection -> {
-                    // TODO take a look at this
                     val prompt = Prompt(intent.getString("question").orEmpty(), true)
                     showResponseDialog(prompt, null)
                 }
@@ -234,7 +232,7 @@ class MainActivity : AppCompatActivity() {
             set(SECOND, 0)
         }.timeInMillis
 
-        // TODO: add question to it
+        // TODO: add prompt to it
         val pendingIntent = getBroadcast(
             this, 346538746,
             Intent(this, AlarmReceiver::class.java), FLAG_UPDATE_CURRENT
@@ -261,6 +259,4 @@ class MainActivity : AppCompatActivity() {
 // TODO:
 //  - reflection only at 9pm
 //  - brainstorm name
-//  - refactor question to prompt
-//  - server returns prompt body and isQuestion
 
