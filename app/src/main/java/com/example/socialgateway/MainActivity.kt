@@ -47,8 +47,10 @@ class MainActivity : AppCompatActivity() {
         // make sure network request is not done on UI thread???
         assert(Looper.myLooper() != Looper.getMainLooper())
 
+        ServerInterface(this).getPrompt(socialApp, promptType)
+
         try {
-            return ServerInterface().getPrompt(socialApp, promptType)
+            return ServerInterface(this).getPrompt(socialApp, promptType)
         } catch (exception: Exception) {
             val errorMessage = resources.getString(
                 when (exception) {
@@ -76,7 +78,11 @@ class MainActivity : AppCompatActivity() {
             val name = getString(R.string.channel_name)
             val descriptionText = getString(R.string.channel_description)
             val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(getString(R.string.notificationChannelId), name, importance).apply {
+            val channel = NotificationChannel(
+                getString(R.string.notificationChannelId),
+                name,
+                importance
+            ).apply {
                 description = descriptionText
             }
             // Register the channel with the system
@@ -104,7 +110,7 @@ class MainActivity : AppCompatActivity() {
                 setPositiveButton(android.R.string.ok) { _, _ ->
                     // TODO stop recording or playing
                     if (prompt.answerable) {
-                        ServerInterface().sendAnswer(
+                        ServerInterface(this@MainActivity).sendAnswer(
                             // TODO KATIE how should check-in work
                             socialApp?.name ?: "check-in",
                             userId,

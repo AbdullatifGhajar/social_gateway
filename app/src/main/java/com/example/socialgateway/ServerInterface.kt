@@ -1,5 +1,6 @@
 package com.example.socialgateway
 
+import android.content.Context
 import android.content.res.Resources
 import android.os.AsyncTask
 import org.json.JSONObject
@@ -10,10 +11,10 @@ import java.net.URL
 import java.net.URLEncoder
 import java.util.*
 
-val key: String = Resources.getSystem().getString(R.string.KEY)
-val serverUrlPath: String = Resources.getSystem().getString(R.string.serverUrlPath)
+class ServerInterface(context: Context) {
+    private val key: String = context.resources.getString(R.string.KEY)
+    private val serverUrlPath: String = context.resources.getString(R.string.serverUrlPath)
 
-class ServerInterface() {
     private fun getFromServer(route: String, arguments: String = ""): JSONObject {
         val connection =
             URL("$serverUrlPath$route?key=$key&$arguments").openConnection() as HttpURLConnection
