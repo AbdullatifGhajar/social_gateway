@@ -4,6 +4,7 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.res.Resources
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.NotificationManagerCompat
 
@@ -16,10 +17,18 @@ class AlarmReceiver : BroadcastReceiver() {
             it.putExtra("intentCategory", IntentCategory.CheckIn)
             it.putExtra("question", question)
 
-            PendingIntent.getActivity(context, "check-in".hashCode(), it, PendingIntent.FLAG_CANCEL_CURRENT)
+            PendingIntent.getActivity(
+                context,
+                "check-in".hashCode(),
+                it,
+                PendingIntent.FLAG_CANCEL_CURRENT
+            )
         }
 
-        val builder = NotificationCompat.Builder(context, channelId)
+        val builder = NotificationCompat.Builder(
+            context,
+            Resources.getSystem().getString(R.string.notificationChannelId)
+        )
             .setSmallIcon(R.drawable.placeholder)
             .setContentTitle(context.resources.getString(R.string.check_in_question))
             .setContentText(question)
