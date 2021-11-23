@@ -13,7 +13,7 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
       - name: build prod
-        run: ./gradlew app:assembleDebug
+        run: ./gradlew app:assembleDebug --warning-mode=all
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
