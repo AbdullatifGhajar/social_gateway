@@ -42,23 +42,23 @@ class VoiceRecorder(a: Activity, v: View) {
     init {
         startRecordingIB.setOnClickListener {
             state = "recording"
-            startRecording()
+            // startRecording()
         }
         stopRecordingIB.setOnClickListener {
             state = "recorded"
-            stopRecording()
+            // stopRecording()
         }
         deleteRecordingIB.setOnClickListener {
             state = "initial"
-            deletePlaying()
+            // deletePlaying()
         }
         startPlayingIB.setOnClickListener {
             state = "playing"
-            startPlaying()
+            // startPlaying()
         }
         stopPlayingIB.setOnClickListener {
             state = "recorded"
-            stopPlaying()
+            // stopPlaying()
         }
 
         state = "initial"
