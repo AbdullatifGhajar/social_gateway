@@ -22,6 +22,7 @@ import android.widget.GridView
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
+import java.io.File
 import java.net.ConnectException
 import java.net.UnknownHostException
 import java.util.*
@@ -41,7 +42,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var userId: String
     private lateinit var preferences: SharedPreferences
-    private lateinit var recorder: VoiceRecorder
+    private var recorder: VoiceRecorder? = null
 
     private fun requestPrompt(socialApp: SocialApp, promptType: String = "normal"): Prompt? {
         // make sure network request is not done on UI thread???
@@ -99,8 +100,6 @@ class MainActivity : AppCompatActivity() {
         val typingLayout = layoutInflater.inflate(R.layout.typing_dialog, null)
         val recordingLayout = layoutInflater.inflate(R.layout.recording_dialog, null)
 
-        recorder = VoiceRecorder(this, recordingLayout)
-
         fun dialogWithLayout(layout: View?): AlertDialog {
             return AlertDialog.Builder(this).apply {
                 setMessage(prompt.content)
@@ -116,9 +115,9 @@ class MainActivity : AppCompatActivity() {
                             userId,
                             prompt.content,
                             typingLayout.findViewById<TextView>(R.id.answer_edit_text).text.toString(),
-                            recorder.recordingFile()
+                            if(recorder != null) recorder!!.recordingFile() else null
                         )
-                        recorder.stop()
+                        recorder?.stop()
                     }
 
                     if (socialApp != null) {
@@ -140,13 +139,15 @@ class MainActivity : AppCompatActivity() {
 
         typingLayout.findViewById<ImageButton>(R.id.record_button).setOnClickListener {
             dialog.dismiss()
+            recorder = VoiceRecorder(this, recordingLayout)
             if (recordingLayout.parent != null)
                 (recordingLayout.parent as ViewGroup).removeView(recordingLayout)
             dialog = dialogWithLayout(recordingLayout)
         }
         recordingLayout.findViewById<ImageButton>(R.id.text_button).setOnClickListener {
             dialog.dismiss()
-            recorder.stop()
+            recorder?.stop()
+            recorder = null
             if (recordingLayout.parent != null)
                 (typingLayout.parent as ViewGroup).removeView(typingLayout)
             dialog = dialogWithLayout(typingLayout)

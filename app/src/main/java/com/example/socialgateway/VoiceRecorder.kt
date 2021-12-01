@@ -11,6 +11,7 @@ import android.view.View
 import android.widget.ImageButton
 import java.io.File
 
+private const val PERMISSIONS_RECORD_AUDIO_SOCIAL_GATEWAY = 1
 
 class VoiceRecorder(a: Activity, v: View) {
     private var activity = a
@@ -32,51 +33,50 @@ class VoiceRecorder(a: Activity, v: View) {
 
     private var mFile: File? = null
 
-    fun recordingFile(): File{
-        if(mFile == null)
+    fun recordingFile(): File {
+        if (mFile == null)
             mFile = File.createTempFile("record", ".3gp")
         return mFile!!
     }
 
 
     init {
+        if(!hasPermissions()){
+            requestPermissions()
+        }
+
         startRecordingIB.setOnClickListener {
             state = "recording"
-            // startRecording()
+            startRecording()
         }
         stopRecordingIB.setOnClickListener {
             state = "recorded"
-            // stopRecording()
+            stopRecording()
         }
         deleteRecordingIB.setOnClickListener {
             state = "initial"
-            // deletePlaying()
+            deletePlaying()
         }
         startPlayingIB.setOnClickListener {
             state = "playing"
-            // startPlaying()
+            startPlaying()
         }
         stopPlayingIB.setOnClickListener {
             state = "recorded"
-            // stopPlaying()
+            stopPlaying()
         }
 
         state = "initial"
     }
 
     private fun startRecording() {
-        // log("before recording: " + mFile.length()/1024)
-        if (hasPermissions()) {
-            mRecorder = MediaRecorder().apply{
-                setAudioSource(MediaRecorder.AudioSource.MIC)
-                setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
-                setOutputFile(recordingFile().absolutePath)
-                setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
-                prepare()
-                start()
-            }
-        } else {
-            requestPermissions()
+        mRecorder = MediaRecorder().apply {
+            setAudioSource(MediaRecorder.AudioSource.MIC)
+            setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
+            setOutputFile(recordingFile().absolutePath)
+            setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
+            prepare()
+            start()
         }
     }
 
@@ -86,7 +86,6 @@ class VoiceRecorder(a: Activity, v: View) {
             release()
         }
         mRecorder = null
-        // log("after recording: " + mFile.length()/1024)
     }
 
     private fun deletePlaying() {
@@ -117,22 +116,21 @@ class VoiceRecorder(a: Activity, v: View) {
     }
 
     private fun requestPermissions() {
-        // why 82? use other methods to request permissions
         ActivityCompat.requestPermissions(
             activity,
             arrayOf(RECORD_AUDIO),
-            82
+            PERMISSIONS_RECORD_AUDIO_SOCIAL_GATEWAY
         )
     }
 
-    public fun stop(){
+    fun stop() {
         stopRecording()
         stopPlaying()
     }
 
     private fun applyState() {
         val recorderState = voiceRecorderStates[state] ?: throw Exception()
-        val buttonStates = mapOf<ImageButton, Boolean>(
+        val buttonStates = mapOf(
             startRecordingIB to recorderState.startRecording,
             stopRecordingIB to recorderState.stopRecording,
             deleteRecordingIB to recorderState.deleteRecording,
@@ -140,14 +138,11 @@ class VoiceRecorder(a: Activity, v: View) {
             stopPlayingIB to recorderState.stopPlaying
         )
 
-        for((button, active) in buttonStates)
-        {
-            if(!active) {
+        for ((button, active) in buttonStates) {
+            if (!active) {
                 button.alpha = .5f
                 button.isClickable = false
-            }
-            else
-            {
+            } else {
                 button.alpha = 1f
                 button.isClickable = true
             }

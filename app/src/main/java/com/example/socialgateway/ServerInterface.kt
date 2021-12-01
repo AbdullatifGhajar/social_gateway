@@ -64,11 +64,11 @@ class ServerInterface(context: Context) {
         userId: String,
         prompt: String,
         answerText: String,
-        audio: File
+        audio: File?
     ) {
         var answerAudioUuid = "null"
 
-        audio.let {
+        audio?.let {
             if (it.exists()) {
                 answerAudioUuid = UUID.randomUUID().toString()
                 postToServer(it.readBytes(), "/audio", "uuid=$answerAudioUuid")
