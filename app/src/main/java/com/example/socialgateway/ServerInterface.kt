@@ -70,7 +70,7 @@ class ServerInterface(context: Context) {
             "user_id": "$userId",
             "app_name": "$appName",
             "prompt": "$prompt",
-            "answer_text": "$answerText",
+            "answer_text": "$answerText"
         }"""
             ).toString().toByteArray(), "/answer"
         )
