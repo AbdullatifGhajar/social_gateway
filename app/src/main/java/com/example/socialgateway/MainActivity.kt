@@ -1,7 +1,6 @@
 package com.example.socialgateway
 
 import android.app.AlarmManager
-import android.app.AlertDialog
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent.FLAG_UPDATE_CURRENT
@@ -16,13 +15,8 @@ import android.os.Looper
 import android.support.v7.app.AppCompatActivity
 import android.text.format.DateFormat
 import android.util.Log
-import android.view.View
-import android.view.ViewGroup
 import android.widget.GridView
-import android.widget.ImageButton
-import android.widget.TextView
 import android.widget.Toast
-import java.io.File
 import java.net.ConnectException
 import java.net.UnknownHostException
 import java.util.*
@@ -32,7 +26,7 @@ fun log(message: String) {
     Log.d("SocialGateway", message)
 }
 
-private fun today(): String {
+fun today(): String {
     return DateFormat.format("dd.MM.yyyy", Date()) as String
 }
 
@@ -40,9 +34,11 @@ enum class IntentCategory { AskQuestion, Reflection, CheckIn }
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var userId: String
+    companion object {
+        lateinit var userId: String
+    }
+
     private lateinit var preferences: SharedPreferences
-    private var recorder: VoiceRecorder? = null
 
     private fun requestPrompt(socialApp: SocialApp, promptType: String = "normal"): Prompt? {
         // make sure network request is not done on UI thread???
@@ -93,67 +89,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun showResponseDialog(
-        prompt: Prompt,
-        socialApp: SocialApp?
-    ) {
-        val typingLayout = layoutInflater.inflate(R.layout.typing_dialog, null)
-        val recordingLayout = layoutInflater.inflate(R.layout.recording_dialog, null)
-
-        fun dialogWithLayout(layout: View?): AlertDialog {
-            return AlertDialog.Builder(this).apply {
-                setMessage(prompt.content)
-                setView(layout)
-                setNegativeButton(android.R.string.cancel) { _, _ ->
-                }
-                setPositiveButton(android.R.string.ok) { _, _ ->
-                    // TODO stop recording or playing
-                    if (prompt.answerable) {
-                        ServerInterface(this@MainActivity).sendAnswer(
-                            // TODO KATIE how should check-in work
-                            socialApp?.name ?: "check-in",
-                            userId,
-                            prompt.content,
-                            typingLayout.findViewById<TextView>(R.id.answer_edit_text).text.toString(),
-                            if(recorder != null) recorder!!.recordingFile() else null
-                        )
-                        recorder?.stop()
-                    }
-
-                    if (socialApp != null) {
-                        startApp(socialApp)
-                        // log this for shouldReceivePrompt later
-                        preferences.edit().apply {
-                            putString("last_prompt:${socialApp.name}", today())
-                            putString("lastPromptDate", today())
-                            apply()
-                        }
-                    }
-                }
-            }.create().apply {
-                show()
-            }
-        }
-
-        var dialog = dialogWithLayout(if (prompt.answerable) typingLayout else null)
-
-        typingLayout.findViewById<ImageButton>(R.id.record_button).setOnClickListener {
-            dialog.dismiss()
-            recorder = VoiceRecorder(this, recordingLayout)
-            if (recordingLayout.parent != null)
-                (recordingLayout.parent as ViewGroup).removeView(recordingLayout)
-            dialog = dialogWithLayout(recordingLayout)
-        }
-        recordingLayout.findViewById<ImageButton>(R.id.text_button).setOnClickListener {
-            dialog.dismiss()
-            recorder?.stop()
-            recorder = null
-            if (recordingLayout.parent != null)
-                (typingLayout.parent as ViewGroup).removeView(typingLayout)
-            dialog = dialogWithLayout(typingLayout)
-        }
-    }
-
     private fun startApp(socialApp: SocialApp) {
         startActivity(packageManager.getLaunchIntentForPackage(socialApp.packageName))
     }
@@ -165,6 +100,21 @@ class MainActivity : AppCompatActivity() {
 
     private fun isInstalled(socialApp: SocialApp): Boolean {
         return packageManager.getLaunchIntentForPackage(socialApp.packageName) != null
+    }
+
+    private fun showResponseDialog(prompt: Prompt, socialApp: SocialApp?) {
+        AnswerDialog(this, socialApp, prompt,
+            onSubmit = {
+                if (socialApp != null) {
+                    startApp(socialApp)
+                    // log this for shouldReceivePrompt later
+                    preferences.edit().apply {
+                        putString("last_prompt:${socialApp.name}", today())
+                        putString("lastPromptDate", today())
+                        apply()
+                    }
+                }
+            }, onCancel = { })
     }
 
     private fun chooseApp(socialApp: SocialApp) {
@@ -200,7 +150,6 @@ class MainActivity : AppCompatActivity() {
         createNotificationChannel()
 
         preferences = getPreferences(Context.MODE_PRIVATE)
-
         userId = preferences.getString("userId", "").ifEmpty {
             log("generating new userId")
             UUID.randomUUID().toString()

@@ -1,7 +1,6 @@
 package com.example.socialgateway
 
 import android.content.Context
-import android.content.res.Resources
 import android.os.AsyncTask
 import org.json.JSONObject
 import java.io.File
@@ -59,23 +58,12 @@ class ServerInterface(context: Context) {
         )
     }
 
-    fun sendAnswer(
+    fun sendTextAnswer(
         appName: String,
         userId: String,
         prompt: String,
-        answerText: String,
-        audio: File?
+        answerText: String
     ) {
-        var answerAudioUuid = "null"
-
-        audio?.let {
-            if (it.exists()) {
-                answerAudioUuid = UUID.randomUUID().toString()
-                postToServer(it.readBytes(), "/audio", "uuid=$answerAudioUuid")
-                it.delete()
-            }
-        }
-
         postToServer(
             JSONObject(
                 """{
@@ -83,6 +71,28 @@ class ServerInterface(context: Context) {
             "app_name": "$appName",
             "prompt": "$prompt",
             "answer_text": "$answerText",
+        }"""
+            ).toString().toByteArray(), "/answer"
+        )
+    }
+
+    fun sendAudioAnswer(
+        appName: String,
+        userId: String,
+        prompt: String,
+        audio: File
+    ) {
+
+        val answerAudioUuid = UUID.randomUUID().toString()
+        postToServer(audio.readBytes(), "/audio", "uuid=$answerAudioUuid")
+        audio.delete()
+
+        postToServer(
+            JSONObject(
+                """{
+            "user_id": "$userId",
+            "app_name": "$appName",
+            "prompt": "$prompt",
             "answer_audio_uuid": "$answerAudioUuid"
         }"""
             ).toString().toByteArray(), "/answer"

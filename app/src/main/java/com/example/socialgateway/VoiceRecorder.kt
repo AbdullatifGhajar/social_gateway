@@ -46,23 +46,18 @@ class VoiceRecorder(a: Activity, v: View) {
         }
 
         startRecordingIB.setOnClickListener {
-            state = "recording"
             startRecording()
         }
         stopRecordingIB.setOnClickListener {
-            state = "recorded"
             stopRecording()
         }
         deleteRecordingIB.setOnClickListener {
-            state = "initial"
             deletePlaying()
         }
         startPlayingIB.setOnClickListener {
-            state = "playing"
             startPlaying()
         }
         stopPlayingIB.setOnClickListener {
-            state = "recorded"
             stopPlaying()
         }
 
@@ -78,6 +73,7 @@ class VoiceRecorder(a: Activity, v: View) {
             prepare()
             start()
         }
+        state = "recording"
     }
 
     private fun stopRecording() {
@@ -86,6 +82,7 @@ class VoiceRecorder(a: Activity, v: View) {
             release()
         }
         mRecorder = null
+        state = "recorded"
     }
 
     private fun deletePlaying() {
@@ -93,6 +90,7 @@ class VoiceRecorder(a: Activity, v: View) {
         stopPlaying()
         mFile?.delete()
         mFile = null
+        state = "initial"
     }
 
     private fun startPlaying() {
@@ -100,12 +98,17 @@ class VoiceRecorder(a: Activity, v: View) {
             setDataSource(recordingFile().absolutePath)
             prepare()
             start()
+            setOnCompletionListener {
+                stopPlaying()
+            }
         }
+        state = "playing"
     }
 
     private fun stopPlaying() {
         mPlayer?.release()
         mPlayer = null
+        state = "recorded"
     }
 
     private fun hasPermissions(): Boolean {
