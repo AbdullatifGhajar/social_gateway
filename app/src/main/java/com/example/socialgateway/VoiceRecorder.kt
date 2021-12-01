@@ -17,10 +17,11 @@ class VoiceRecorder(a: Activity, v: View) {
     private var activity = a
     private var view = v
     private var state = "initial"
-        set(value) {
-            field = value
-            applyState()
-        }
+
+    private fun setState(newState: String) {
+        state = newState
+        applyState()
+    }
 
     private var startRecordingIB: ImageButton = view.findViewById(R.id.start_recording_button)
     private var stopRecordingIB: ImageButton = view.findViewById(R.id.stop_recording_button)
@@ -61,7 +62,7 @@ class VoiceRecorder(a: Activity, v: View) {
             stopPlaying()
         }
 
-        state = "initial"
+        setState("initial")
     }
 
     private fun startRecording() {
@@ -73,7 +74,7 @@ class VoiceRecorder(a: Activity, v: View) {
             prepare()
             start()
         }
-        state = "recording"
+        setState("recording")
     }
 
     private fun stopRecording() {
@@ -82,7 +83,7 @@ class VoiceRecorder(a: Activity, v: View) {
             release()
         }
         mRecorder = null
-        state = "recorded"
+        setState("recorded")
     }
 
     private fun deletePlaying() {
@@ -90,7 +91,7 @@ class VoiceRecorder(a: Activity, v: View) {
         stopPlaying()
         mFile?.delete()
         mFile = null
-        state = "initial"
+        setState("initial")
     }
 
     private fun startPlaying() {
@@ -102,13 +103,13 @@ class VoiceRecorder(a: Activity, v: View) {
                 stopPlaying()
             }
         }
-        state = "playing"
+        setState("playing")
     }
 
     private fun stopPlaying() {
         mPlayer?.release()
         mPlayer = null
-        state = "recorded"
+        setState("recorded")
     }
 
     private fun hasPermissions(): Boolean {
