@@ -6,13 +6,15 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
-        android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        android:theme="@style/AppTheme"
+        android:fullBackupOnly="true"
+        android:allowBackup="true">
+        <activity android:name=".MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -20,13 +22,15 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".SocialGatewayWidgetConfigurationActivity">
+        <activity android:name=".SocialGatewayWidgetConfigurationActivity"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>
         </activity>
 
-        <receiver android:name=".SocialGatewayWidgetProvider">
+        <receiver android:name=".SocialGatewayWidgetProvider"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -34,6 +38,9 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/appwidget_info" />
         </receiver>
-        <receiver android:name=".AlarmReceiver" />
+        <receiver
+            android:name=".ReflectionNotification"
+            android:enabled="true"
+            android:exported="false" />
     </application>
 </manifest>
