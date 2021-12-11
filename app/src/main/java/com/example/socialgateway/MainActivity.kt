@@ -156,8 +156,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // val i = Intent(this, ReflectionNotification::class.java)
-        // sendBroadcast(i)
+        // sendBroadcast(Intent(this, ReflectionNotification::class.java))
 
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val dailyTriggerTime = getInstance().apply {

@@ -15,39 +15,42 @@ import android.support.v4.app.NotificationManagerCompat
 class ReflectionNotification : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent?) {
         AsyncTask.execute {
-            val prompt = ServerInterface(context).getPrompt(null, "reflection")
+            try {
+                val prompt = ServerInterface(context).getPrompt(null, "reflection")
+                assert(prompt.answerable)
 
-            assert(prompt.answerable)
+                val reflectionIntent = Intent(context, MainActivity::class.java).let {
+                    it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    it.putExtra("intentCategory", IntentCategory.Reflection)
+                    it.putExtra("question", prompt.content)
+                }
 
-            val reflectionIntent = Intent(context, MainActivity::class.java).let {
-                it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                it.putExtra("intentCategory", IntentCategory.Reflection)
-                it.putExtra("question", prompt.content)
-            }
+                val pendingIntent = PendingIntent.getActivity(
+                    context,
+                    "reflection".hashCode(),
+                    reflectionIntent,
+                    0
+                )
 
-            val pendingIntent = PendingIntent.getActivity(
-                context,
-                "reflection".hashCode(),
-                reflectionIntent,
-                0
-            )
+                val builder = NotificationCompat.Builder(
+                    context,
+                    context.getString(R.string.notificationChannelId)
+                )
+                    .setSmallIcon(R.drawable.placeholder)
+                    .setContentTitle(context.resources.getString(R.string.check_in_question))
+                    .setContentText(prompt.content)
+                    .setStyle(NotificationCompat.BigTextStyle().bigText(prompt.content))
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .setContentIntent(pendingIntent)
+                    .setAutoCancel(true)
 
-            val builder = NotificationCompat.Builder(
-                context,
-                context.getString(R.string.notificationChannelId)
-            )
-                .setSmallIcon(R.drawable.placeholder)
-                .setContentTitle(context.resources.getString(R.string.check_in_question))
-                .setContentText(prompt.content)
-                .setStyle(NotificationCompat.BigTextStyle().bigText(prompt.content))
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true)
-
-            // notificationId is a unique int for each notification that you must define
-            val notificationId = System.currentTimeMillis() % Int.MAX_VALUE
-            with(NotificationManagerCompat.from(context)) {
-                notify(notificationId.toInt(), builder.build())
+                // notificationId is a unique int for each notification that you must define
+                val notificationId = System.currentTimeMillis() % Int.MAX_VALUE
+                with(NotificationManagerCompat.from(context)) {
+                    notify(notificationId.toInt(), builder.build())
+                }
+            } catch (e: Exception) {
+                // something went wrong, don't do a notification
             }
         }
     }
