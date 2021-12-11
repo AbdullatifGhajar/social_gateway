@@ -27,7 +27,7 @@ fun today(): String {
     return DateFormat.format("dd.MM.yyyy", Date()) as String
 }
 
-enum class IntentCategory { AskQuestion, Reflection, CheckIn }
+enum class IntentCategory { AskQuestion, Reflection }
 
 class MainActivity : AppCompatActivity() {
 
@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var preferences: SharedPreferences
 
-    private fun requestPrompt(socialApp: SocialApp, promptType: String = "normal"): Prompt? {
+    private fun requestPrompt(socialApp: SocialApp, promptType: PromptType = PromptType.NORMAL): Prompt? {
         // make sure network request is not done on UI thread???
         assert(Looper.myLooper() != Looper.getMainLooper())
 

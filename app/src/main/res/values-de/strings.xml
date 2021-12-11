@@ -8,7 +8,6 @@
     <string name="channel_name">SocialGateway Benachrichtigungskanal</string>
     <string name="delete_recording">lösche Aufnahme</string>
     <string name="reflection_question">Reflektionsfrage</string>
-    <string name="check_in_question">Tagesfrage</string>
     <string name="start_recording">starte Aufnahme</string>
     <string name="stop_recording">stoppe Aufnahme</string>
     <string name="type_answer_here_or_record_audio">schreibe eine Antwort</string>

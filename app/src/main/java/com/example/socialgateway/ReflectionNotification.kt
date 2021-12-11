@@ -16,7 +16,7 @@ class ReflectionNotification : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent?) {
         AsyncTask.execute {
             try {
-                val prompt = ServerInterface(context).getPrompt(null, "reflection")
+                val prompt = ServerInterface(context).getPrompt(null, PromptType.REFLECTION)
                 assert(prompt.answerable)
 
                 val reflectionIntent = Intent(context, MainActivity::class.java).let {
@@ -37,7 +37,7 @@ class ReflectionNotification : BroadcastReceiver() {
                     context.getString(R.string.notificationChannelId)
                 )
                     .setSmallIcon(R.drawable.placeholder)
-                    .setContentTitle(context.resources.getString(R.string.check_in_question))
+                    .setContentTitle(context.resources.getString(R.string.reflection_question))
                     .setContentText(prompt.content)
                     .setStyle(NotificationCompat.BigTextStyle().bigText(prompt.content))
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)

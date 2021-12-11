@@ -15,7 +15,8 @@ class ServerInterface(context: Context) {
     private val serverUrlPath: String = context.resources.getString(R.string.serverUrlPath)
 
     private fun getFromServer(route: String, arguments: String = ""): JSONObject {
-        val connection = URL("$serverUrlPath$route?key=$key&$arguments").openConnection() as HttpURLConnection
+        val connection =
+            URL("$serverUrlPath$route?key=$key&$arguments").openConnection() as HttpURLConnection
         connection.disconnect()
 
         if (connection.responseCode != HttpURLConnection.HTTP_OK)
@@ -42,10 +43,10 @@ class ServerInterface(context: Context) {
         }
     }
 
-    fun getPrompt(socialApp: SocialApp?, promptType: String = "normal"): Prompt {
+    fun getPrompt(socialApp: SocialApp?, promptType: PromptType = PromptType.NORMAL): Prompt {
         val language = if (Locale.getDefault().language == "de") "german" else "english"
 
-        val parameterList = mutableListOf("language=$language", "prompt_type=$promptType")
+        val parameterList = mutableListOf("language=$language", "prompt_type=${promptType.value}")
 
         if (socialApp != null) {
             val encodedAppName = URLEncoder.encode(socialApp.name, "utf-8")
