@@ -42,8 +42,10 @@ class VoiceRecorder(a: Activity, v: View) {
 
 
     init {
-        if(!hasPermissions()){
+        if (!hasPermissions()) {
             requestPermissions()
+            if (hasPermissions())
+                throw IllegalStateException()
         }
 
         startRecordingIB.setOnClickListener {
@@ -112,7 +114,7 @@ class VoiceRecorder(a: Activity, v: View) {
         setState("recorded")
     }
 
-    private fun hasPermissions(): Boolean {
+    fun hasPermissions(): Boolean {
         return ContextCompat.checkSelfPermission(
             activity,
             RECORD_AUDIO
