@@ -9,16 +9,16 @@ import android.widget.TextView
 import com.example.socialgateway.MainActivity.Companion.userId
 
 class AnswerDialog(
-        private val activity: Activity,
-        private val socialApp: SocialApp?,
-        private val prompt: Prompt,
-        private val onSubmit: () -> Unit,
-        private val onCancel: () -> Unit
+    private val activity: Activity,
+    private val socialApp: SocialApp?,
+    private val prompt: Prompt,
+    private val onSubmit: () -> Unit,
+    private val onCancel: () -> Unit
 ) {
 
     private val typingLayout: View = activity.layoutInflater.inflate(R.layout.typing_dialog, null)
     private val recordingLayout: View =
-            activity.layoutInflater.inflate(R.layout.recording_dialog, null)
+        activity.layoutInflater.inflate(R.layout.recording_dialog, null)
     private var recorder: VoiceRecorder? = null
     private lateinit var dialog: AlertDialog
     private var dialogType = "default"
@@ -68,18 +68,18 @@ class AnswerDialog(
             setPositiveButton(android.R.string.ok) { _, _ ->
                 when (dialogType) {
                     "recording" -> ServerInterface(activity).sendAudioAnswer(
-                            // TODO KATIE how should check-in work
-                            socialApp?.name ?: "check-in",
-                            userId,
-                            prompt.content,
-                            recorder!!.recordingFile()
+                        // TODO KATIE how should check-in work
+                        socialApp?.name ?: "check-in",
+                        userId,
+                        prompt.content,
+                        recorder!!.recordingFile()
                     )
                     "typing" -> ServerInterface(activity).sendTextAnswer(
-                            // TODO KATIE how should check-in work
-                            socialApp?.name ?: "check-in",
-                            userId,
-                            prompt.content,
-                            typingLayout.findViewById<TextView>(R.id.answer_edit_text).text.toString()
+                        // TODO KATIE how should check-in work
+                        socialApp?.name ?: "check-in",
+                        userId,
+                        prompt.content,
+                        typingLayout.findViewById<TextView>(R.id.answer_edit_text).text.toString()
                     )
                     "default" -> {}
                 }

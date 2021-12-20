@@ -5,10 +5,10 @@ import android.app.Activity
 import android.content.pm.PackageManager
 import android.media.MediaPlayer
 import android.media.MediaRecorder
-import android.support.v4.app.ActivityCompat
-import android.support.v4.content.ContextCompat
 import android.view.View
 import android.widget.ImageButton
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import java.io.File
 
 private const val PERMISSIONS_RECORD_AUDIO_SOCIAL_GATEWAY = 1

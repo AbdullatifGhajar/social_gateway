@@ -9,11 +9,11 @@ import android.content.SharedPreferences
 import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Looper
-import android.support.v7.app.AppCompatActivity
 import android.text.format.DateFormat
 import android.util.Log
 import android.widget.GridView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import java.net.ConnectException
 import java.net.UnknownHostException
 import java.util.*
@@ -37,7 +37,10 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var preferences: SharedPreferences
 
-    private fun requestPrompt(socialApp: SocialApp, promptType: PromptType = PromptType.NORMAL): Prompt? {
+    private fun requestPrompt(
+        socialApp: SocialApp,
+        promptType: PromptType = PromptType.NORMAL
+    ): Prompt? {
         // make sure network request is not done on UI thread???
         assert(Looper.myLooper() != Looper.getMainLooper())
 
