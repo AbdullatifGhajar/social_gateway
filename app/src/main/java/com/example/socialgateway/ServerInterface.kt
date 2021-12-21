@@ -1,7 +1,6 @@
 package com.example.socialgateway
 
 import android.content.Context
-import android.os.AsyncTask
 import org.json.JSONObject
 import java.io.File
 import java.net.ConnectException
@@ -26,7 +25,7 @@ class ServerInterface(context: Context) {
     }
 
     private fun postToServer(data: ByteArray, route: String, arguments: String = "") {
-        AsyncTask.execute {
+        Thread {
             val connection =
                 (URL("$serverUrlPath$route?key=$key&$arguments").openConnection() as HttpURLConnection)
 
@@ -40,7 +39,7 @@ class ServerInterface(context: Context) {
             }
 
             connection.disconnect()
-        }
+        }.start()
     }
 
     fun getPrompt(socialApp: SocialApp?, promptType: PromptType = PromptType.NORMAL): Prompt {

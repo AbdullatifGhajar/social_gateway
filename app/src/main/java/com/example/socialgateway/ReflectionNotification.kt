@@ -7,14 +7,13 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.os.AsyncTask
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 
 class ReflectionNotification : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent?) {
-        AsyncTask.execute {
+        Thread {
             try {
                 val prompt = ServerInterface(context).getPrompt(null, PromptType.REFLECTION)
                 assert(prompt.answerable)
@@ -52,7 +51,7 @@ class ReflectionNotification : BroadcastReceiver() {
             } catch (e: Exception) {
                 // something went wrong, don't do a notification
             }
-        }
+        }.start()
     }
 }
 

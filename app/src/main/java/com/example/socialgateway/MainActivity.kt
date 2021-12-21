@@ -6,7 +6,6 @@ import android.app.PendingIntent.getBroadcast
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Looper
 import android.text.format.DateFormat
@@ -110,7 +109,8 @@ class MainActivity : AppCompatActivity() {
             return
         } */
 
-        AsyncTask.execute {
+
+        Thread {
             val prompt = requestPrompt(socialApp)
             if (prompt == null) {
                 startApp(socialApp)
@@ -119,7 +119,9 @@ class MainActivity : AppCompatActivity() {
                     showResponseDialog(prompt, socialApp)
                 }
             }
-        }
+        }.start()
+
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -130,7 +132,7 @@ class MainActivity : AppCompatActivity() {
         createNotificationChannel(this)
 
         preferences = getPreferences(Context.MODE_PRIVATE)
-        userId = preferences.getString("userId", "").ifEmpty {
+        userId = preferences.getString("userId", "").toString().ifEmpty {
             log("generating new userId")
             UUID.randomUUID().toString()
         }

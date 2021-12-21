@@ -13,9 +13,7 @@ import java.io.File
 
 private const val PERMISSIONS_RECORD_AUDIO_SOCIAL_GATEWAY = 1
 
-class VoiceRecorder(a: Activity, v: View) {
-    private var activity = a
-    private var view = v
+class VoiceRecorder(private val activity: Activity, view: View) {
     private var state = "initial"
 
     private fun setState(newState: String) {
@@ -68,7 +66,7 @@ class VoiceRecorder(a: Activity, v: View) {
     }
 
     private fun startRecording() {
-        mRecorder = MediaRecorder().apply {
+        mRecorder = MediaRecorder(activity).apply {
             setAudioSource(MediaRecorder.AudioSource.MIC)
             setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
             setOutputFile(recordingFile().absolutePath)
