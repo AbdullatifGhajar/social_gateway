@@ -66,7 +66,7 @@ class VoiceRecorder(private val activity: Activity, view: View) {
     }
 
     private fun startRecording() {
-        mRecorder = MediaRecorder(activity).apply {
+        mRecorder = MediaRecorder().apply {
             setAudioSource(MediaRecorder.AudioSource.MIC)
             setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
             setOutputFile(recordingFile().absolutePath)

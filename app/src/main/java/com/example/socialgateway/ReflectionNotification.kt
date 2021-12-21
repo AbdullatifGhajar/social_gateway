@@ -59,22 +59,20 @@ class ReflectionNotification : BroadcastReceiver() {
 // the NotificationChannel class is new and not in the support library
 // https://developer.android.com/training/notify-user/build-notification
 fun createNotificationChannel(activity: Activity) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        val name = activity.getString(R.string.channel_name)
-        val descriptionText = activity.getString(R.string.channel_description)
-        val importance = NotificationManager.IMPORTANCE_DEFAULT
-        val notificationChannelId = activity.getString(R.string.notificationChannelId)
+    val name = activity.getString(R.string.channel_name)
+    val descriptionText = activity.getString(R.string.channel_description)
+    val importance = NotificationManager.IMPORTANCE_DEFAULT
+    val notificationChannelId = activity.getString(R.string.notificationChannelId)
 
-        val channel = NotificationChannel(
-            notificationChannelId,
-            name,
-            importance
-        ).apply {
-            description = descriptionText
-        }
-        // Register the channel with the system
-        val notificationManager =
-            activity.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.createNotificationChannel(channel)
+    val channel = NotificationChannel(
+        notificationChannelId,
+        name,
+        importance
+    ).apply {
+        description = descriptionText
     }
+    // Register the channel with the system
+    val notificationManager =
+        activity.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    notificationManager.createNotificationChannel(channel)
 }
