@@ -1,4 +1,4 @@
-package com.example.socialgateway
+package com.socialgateway.socialgateway
 
 import android.app.Activity
 import android.appwidget.AppWidgetManager
@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.GridView
 import androidx.appcompat.app.AppCompatActivity
+import socialgateway.socialgateway.R
 
 class SocialGatewayWidgetConfigurationActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

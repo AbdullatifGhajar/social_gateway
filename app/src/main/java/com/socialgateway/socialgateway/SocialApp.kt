@@ -1,4 +1,6 @@
-package com.example.socialgateway
+package com.socialgateway.socialgateway
+
+import socialgateway.socialgateway.R
 
 class SocialApp(
     val name: String,

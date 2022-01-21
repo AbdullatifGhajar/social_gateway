@@ -1,4 +1,4 @@
-package com.example.socialgateway
+package com.socialgateway.socialgateway
 
 data class Prompt(
     val content: String,

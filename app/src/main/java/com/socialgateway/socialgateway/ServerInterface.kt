@@ -1,7 +1,8 @@
-package com.example.socialgateway
+package com.socialgateway.socialgateway
 
 import android.content.Context
 import org.json.JSONObject
+import socialgateway.socialgateway.R
 import java.io.File
 import java.net.ConnectException
 import java.net.HttpURLConnection

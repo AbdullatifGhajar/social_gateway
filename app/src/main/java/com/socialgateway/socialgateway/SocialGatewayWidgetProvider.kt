@@ -1,4 +1,4 @@
-package com.example.socialgateway
+package com.socialgateway.socialgateway
 
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
@@ -6,6 +6,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
+import socialgateway.socialgateway.R
 
 val appWidgetIdToSocialApp = mutableMapOf<Int, SocialApp>()
 

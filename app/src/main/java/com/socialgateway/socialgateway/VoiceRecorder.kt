@@ -1,4 +1,4 @@
-package com.example.socialgateway
+package com.socialgateway.socialgateway
 
 import android.Manifest.permission.RECORD_AUDIO
 import android.app.Activity
@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.ImageButton
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import socialgateway.socialgateway.R
 import java.io.File
 
 private const val PERMISSIONS_RECORD_AUDIO_SOCIAL_GATEWAY = 1

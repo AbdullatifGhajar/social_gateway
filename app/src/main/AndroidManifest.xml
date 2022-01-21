@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.socialgateway">
+    package="socialgateway.socialgateway">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
@@ -27,7 +27,7 @@
         android:theme="@style/AppTheme"
         android:fullBackupOnly="true"
         android:allowBackup="true">
-        <activity android:name=".MainActivity"
+        <activity android:name="com.socialgateway.socialgateway.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -36,14 +36,14 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".SocialGatewayWidgetConfigurationActivity"
+        <activity android:name="com.socialgateway.socialgateway.SocialGatewayWidgetConfigurationActivity"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>
         </activity>
 
-        <receiver android:name=".SocialGatewayWidgetProvider"
+        <receiver android:name="com.socialgateway.socialgateway.SocialGatewayWidgetProvider"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -53,7 +53,7 @@
                 android:resource="@xml/appwidget_info" />
         </receiver>
         <receiver
-            android:name=".ReflectionNotification"
+            android:name="com.socialgateway.socialgateway.ReflectionNotification"
             android:enabled="true"
             android:exported="false" />
     </application>

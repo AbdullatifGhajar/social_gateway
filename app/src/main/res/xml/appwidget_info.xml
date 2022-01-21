@@ -4,7 +4,7 @@
                     android:minHeight="20dp"
                     android:updatePeriodMillis="0"
                     android:initialLayout="@layout/widget"
-                    android:configure="com.example.socialgateway.SocialGatewayWidgetConfigurationActivity"
+                    android:configure="socialgateway.socialgateway.SocialGatewayWidgetConfigurationActivity"
                     android:resizeMode="none"
                     android:widgetCategory="home_screen">
 </appwidget-provider>

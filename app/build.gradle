@@ -7,7 +7,7 @@ apply plugin: 'kotlin-android-extensions'
 android {
     compileSdkVersion 30
     defaultConfig {
-        applicationId "com.example.socialgateway"
+        applicationId "com.socialgateway.socialgateway"
         minSdkVersion 30
         targetSdkVersion 30
         versionCode 1

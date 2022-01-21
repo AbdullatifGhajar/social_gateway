@@ -1,4 +1,4 @@
-package com.example.socialgateway
+package com.socialgateway.socialgateway
 
 import android.annotation.SuppressLint
 import android.content.Context

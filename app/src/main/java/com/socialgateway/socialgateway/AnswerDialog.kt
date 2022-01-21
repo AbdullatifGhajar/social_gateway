@@ -1,4 +1,4 @@
-package com.example.socialgateway
+package com.socialgateway.socialgateway
 
 import android.app.Activity
 import android.app.AlertDialog
@@ -6,7 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
-import com.example.socialgateway.MainActivity.Companion.userId
+import com.socialgateway.socialgateway.MainActivity.Companion.userId
+import socialgateway.socialgateway.R
 
 class AnswerDialog(
     private val activity: Activity,

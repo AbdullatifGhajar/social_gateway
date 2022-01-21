@@ -1,4 +1,4 @@
-package com.example.socialgateway
+package com.socialgateway.socialgateway
 
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -13,6 +13,7 @@ import android.util.Log
 import android.widget.GridView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import socialgateway.socialgateway.R
 import java.net.ConnectException
 import java.net.UnknownHostException
 import java.util.*
