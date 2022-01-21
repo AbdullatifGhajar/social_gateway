@@ -5,7 +5,7 @@ class SocialApp(
     val packageName: String,
     val imageId: Int
 )
-
+// remember to include every app in manifest
 val SocialApps = listOf(
     SocialApp("Snapchat", "com.snapchat.android", R.drawable.snapchat),
     SocialApp("TikTok", "com.zhiliaoapp.musically", R.drawable.tiktok),
