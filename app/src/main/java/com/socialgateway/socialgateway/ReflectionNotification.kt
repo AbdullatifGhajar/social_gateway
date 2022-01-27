@@ -35,7 +35,7 @@ class ReflectionNotification : BroadcastReceiver() {
                     context,
                     context.getString(R.string.notificationChannelId)
                 )
-                    .setSmallIcon(R.drawable.placeholder)
+                    .setSmallIcon(R.drawable.icon)
                     .setContentTitle(context.resources.getString(R.string.reflection_question))
                     .setContentText(prompt.content)
                     .setStyle(NotificationCompat.BigTextStyle().bigText(prompt.content))

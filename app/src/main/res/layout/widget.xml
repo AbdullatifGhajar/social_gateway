@@ -7,6 +7,6 @@
             android:id="@+id/widget_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/placeholder"
+            android:src="@drawable/icon"
             android:contentDescription="@string/a_social_media_app_icon"/>
 </RelativeLayout>
