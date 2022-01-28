@@ -29,7 +29,7 @@ class SocialGatewayWidgetProvider : AppWidgetProvider() {
         ) {
             val socialApp = appWidgetIdToSocialApp[appWidgetId] ?: return
 
-            val pendingIntent = Intent(context, MainActivity::class.java).let {
+            val pendingIntent = Intent(context, AppGrid::class.java).let {
                 it.putExtra("intentCategory", IntentCategory.AskQuestion)
                 it.putExtra("socialAppName", socialApp.name)
                 it.putExtra("socialAppPackageName", socialApp.packageName)

@@ -13,6 +13,7 @@ import android.util.Log
 import android.widget.GridView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.socialgateway.socialgateway.ui.login.LoginActivity
 import socialgateway.socialgateway.R
 import java.net.ConnectException
 import java.net.UnknownHostException
@@ -29,7 +30,8 @@ fun today(): String {
 
 enum class IntentCategory { AskQuestion, Reflection }
 
-class MainActivity : AppCompatActivity() {
+class AppGrid : AppCompatActivity() {
+
 
     companion object {
         lateinit var userId: String
@@ -127,17 +129,18 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.social_apps_grid)
 
         createNotificationChannel(this)
 
-        preferences = getPreferences(Context.MODE_PRIVATE)
-        userId = preferences.getString("userId", "").toString().ifEmpty {
-            log("generating new userId")
-            UUID.randomUUID().toString()
+        preferences = getSharedPreferences("login", Context.MODE_PRIVATE)
+        userId = preferences.getString("userId", "").toString()
+
+        if(userId.isEmpty())
+        {
+            startActivity(Intent(this, LoginActivity::class.java))
+            // TODO prevent user from clicking on back button
         }
-        log("userId: $userId")
 
         findViewById<GridView>(R.id.social_apps_grid).adapter =
             SocialAppAdapter(this) { _, socialApp ->

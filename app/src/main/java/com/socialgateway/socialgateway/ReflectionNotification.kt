@@ -18,7 +18,7 @@ class ReflectionNotification : BroadcastReceiver() {
                 val prompt = ServerInterface(context).getPrompt(null, PromptType.REFLECTION)
                 assert(prompt.answerable)
 
-                val reflectionIntent = Intent(context, MainActivity::class.java).let {
+                val reflectionIntent = Intent(context, AppGrid::class.java).let {
                     it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     it.putExtra("intentCategory", IntentCategory.Reflection)
                     it.putExtra("question", prompt.content)
