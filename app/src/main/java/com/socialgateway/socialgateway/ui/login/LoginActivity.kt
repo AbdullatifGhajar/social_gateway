@@ -63,11 +63,10 @@ class LoginActivity : AppCompatActivity() {
                 updateUiWithUser(loginResult.success)
                 setUserId(loginResult.success)
                 startActivity(Intent(this, AppGridActivity::class.java))
+                //Complete and destroy login activity once successful
+                finish()
             }
             setResult(Activity.RESULT_OK)
-
-            //Complete and destroy login activity once successful
-            finish()
         })
 
         username.afterTextChanged {
@@ -102,10 +101,11 @@ class LoginActivity : AppCompatActivity() {
             }
         }
     }
+
     private fun setUserId(model: LoggedInUserView) {
         val preferences = getSharedPreferences("login", Context.MODE_PRIVATE)
         preferences.edit().apply {
-            putString("userId", "got changed")
+            putString("userId", model.id)
             apply()
         }
     }

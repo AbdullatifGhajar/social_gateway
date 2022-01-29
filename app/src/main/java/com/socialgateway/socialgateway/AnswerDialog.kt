@@ -68,14 +68,14 @@ class AnswerDialog(
             }
             setPositiveButton(android.R.string.ok) { _, _ ->
                 when (dialogType) {
-                    "recording" -> ServerInterface(activity).sendAudioAnswer(
+                    "recording" -> ServerInterface.sendAudioAnswer(
                         // TODO KATIE how should check-in work
                         socialApp?.name ?: "check-in",
                         userId,
                         prompt.content,
                         recorder!!.recordingFile()
                     )
-                    "typing" -> ServerInterface(activity).sendTextAnswer(
+                    "typing" -> ServerInterface.sendTextAnswer(
                         // TODO KATIE how should check-in work
                         socialApp?.name ?: "check-in",
                         userId,

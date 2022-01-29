@@ -1,108 +1,146 @@
 package com.socialgateway.socialgateway
 
-import android.content.Context
+import com.socialgateway.socialgateway.data.model.LoggedInUser
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 import socialgateway.socialgateway.R
 import java.io.File
-import java.net.ConnectException
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
 import java.util.*
 
-class ServerInterface(context: Context) {
-    private val key: String = context.resources.getString(R.string.KEY)
-    private val serverUrlPath: String = context.resources.getString(R.string.serverUrlPath)
+class ServerException(message: String) : Exception(message)
 
-    private fun getFromServer(route: String, arguments: String = ""): JSONObject {
-        val connection =
-            URL("$serverUrlPath$route?key=$key&$arguments").openConnection() as HttpURLConnection
-        connection.disconnect()
+class ServerInterface {
+    companion object {
+        private val key: String = SocialGatewayApp.resources!!.getString(R.string.KEY)
+        private val serverUrlPath: String =
+            SocialGatewayApp.resources!!.getString(R.string.serverUrlPath)
 
-        if (connection.responseCode != HttpURLConnection.HTTP_OK)
-            throw ConnectException("GET response code ${connection.responseCode}")
+        private fun getFromServer(route: String, arguments: String = ""): JSONObject {
+            var responseBody = ""
+            runBlocking {
+                async(Dispatchers.IO) {
+                    val connection =
+                        URL("$serverUrlPath$route?key=$key&$arguments").openConnection() as HttpURLConnection
+                    connection.disconnect()
 
-        return JSONObject(connection.inputStream.reader().readText())
-    }
+                    if (connection.responseCode != HttpURLConnection.HTTP_OK)
+                        throw ServerException("GET response code ${connection.responseCode}")
+                    responseBody = connection.inputStream.reader().readText()
 
-    private fun postToServer(data: ByteArray, route: String, arguments: String = "") {
-        Thread {
-            val connection =
-                (URL("$serverUrlPath$route?key=$key&$arguments").openConnection() as HttpURLConnection)
-
-            connection.apply {
-                requestMethod = "POST"
-                doOutput = true
-                outputStream.write(data)
-                if (responseCode != HttpURLConnection.HTTP_OK) {
-                    throw ConnectException("response code $responseCode")
-                }
+                }.join()
             }
-
-            connection.disconnect()
-        }.start()
-    }
-
-    fun getPrompt(socialApp: SocialApp?, promptType: PromptType = PromptType.NORMAL): Prompt {
-        val language = if (Locale.getDefault().language == "de") "german" else "english"
-
-        val parameterList = mutableListOf("language=$language", "prompt_type=${promptType.value}")
-
-        if (socialApp != null) {
-            val encodedAppName = URLEncoder.encode(socialApp.name, "utf-8")
-            parameterList.add("app_name=$encodedAppName")
+            return JSONObject(responseBody)
         }
 
+        private fun postToServer(
+            route: String,
+            arguments: String = "",
+            data: ByteArray? = null
+        ) {
+            Thread {
+                val connection =
+                    (URL("$serverUrlPath$route?key=$key&$arguments").openConnection() as HttpURLConnection)
 
-        val responseJson = getFromServer(
-            "/prompt",
-            parameterList.joinToString(separator = "&")
-        )
+                connection.apply {
+                    requestMethod = "POST"
+                    doOutput = true
+                    if (data != null)
+                        outputStream.write(data)
+                    if (responseCode != HttpURLConnection.HTTP_OK) {
+                        throw ServerException("POST response code $responseCode")
+                    }
+                }
 
-        return Prompt(
-            responseJson.getString("content"),
-            responseJson.getBoolean("answerable")
-        )
-    }
+                connection.disconnect()
+            }.start()
+        }
 
-    fun sendTextAnswer(
-        appName: String,
-        userId: String,
-        prompt: String,
-        answerText: String
-    ) {
-        postToServer(
-            JSONObject(
-                """{
-            "user_id": "$userId",
-            "app_name": "$appName",
-            "prompt": "$prompt",
-            "answer_text": "$answerText"
-        }"""
-            ).toString().toByteArray(), "/answer"
-        )
-    }
+        fun getPrompt(
+            socialApp: SocialApp?,
+            promptType: PromptType = PromptType.NORMAL
+        ): Prompt {
+            val language = if (Locale.getDefault().language == "de") "german" else "english"
 
-    fun sendAudioAnswer(
-        appName: String,
-        userId: String,
-        prompt: String,
-        audio: File
-    ) {
+            val parameterList =
+                mutableListOf("language=$language", "prompt_type=${promptType.value}")
 
-        val answerAudioUuid = UUID.randomUUID().toString()
-        postToServer(audio.readBytes(), "/audio", "uuid=$answerAudioUuid")
-        audio.delete()
+            if (socialApp != null) {
+                val encodedAppName = URLEncoder.encode(socialApp.name, "utf-8")
+                parameterList.add("app_name=$encodedAppName")
+            }
 
-        postToServer(
-            JSONObject(
-                """{
-            "user_id": "$userId",
-            "app_name": "$appName",
-            "prompt": "$prompt",
-            "answer_audio_uuid": "$answerAudioUuid"
-        }"""
-            ).toString().toByteArray(), "/answer"
-        )
+            val responseJson = getFromServer(
+                "/prompt",
+                parameterList.joinToString(separator = "&")
+            )
+
+            return Prompt(
+                responseJson.getString("content"),
+                responseJson.getBoolean("answerable")
+            )
+        }
+
+        fun sendTextAnswer(
+            appName: String,
+            userId: String,
+            prompt: String,
+            answerText: String
+        ) {
+            postToServer(
+                "/answer",
+                "",
+                JSONObject(
+                    mapOf(
+                        "user_id" to userId,
+                        "app_name" to appName,
+                        "prompt" to prompt,
+                        "answer_text" to answerText
+                    )
+                ).toString().toByteArray()
+            )
+        }
+
+        fun sendAudioAnswer(
+            appName: String,
+            userId: String,
+            prompt: String,
+            audio: File
+        ) {
+
+            val answerAudioUuid = UUID.randomUUID().toString()
+            postToServer("/audio", "uuid=$answerAudioUuid", audio.readBytes())
+            audio.delete()
+
+            postToServer(
+                "/answer",
+                "",
+                JSONObject(
+                    mapOf(
+                        "user_id" to userId,
+                        "app_name" to appName,
+                        "prompt" to prompt,
+                        "answer_audio_uuid" to answerAudioUuid
+                    )
+                ).toString().toByteArray()
+            )
+        }
+
+        fun getAuthenticatedUser(email: String, password: String): LoggedInUser {
+            val responseJson = getFromServer(
+                "/users",
+                "email=$email&password=$password"
+            )
+
+            return LoggedInUser(
+                responseJson.getString("id"),
+                responseJson.getString("email"),
+                responseJson.getString("displayName")
+            )
+        }
     }
 }

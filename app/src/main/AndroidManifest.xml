@@ -20,6 +20,7 @@
     </queries>
 
     <application
+        android:name="com.socialgateway.socialgateway.SocialGatewayApp"
         android:allowBackup="true"
         android:fullBackupOnly="true"
         android:icon="@drawable/icon"

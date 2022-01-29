@@ -15,7 +15,7 @@ class ReflectionNotification : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent?) {
         Thread {
             try {
-                val prompt = ServerInterface(context).getPrompt(null, PromptType.REFLECTION)
+                val prompt = ServerInterface.getPrompt(null, PromptType.REFLECTION)
                 assert(prompt.answerable)
 
                 val reflectionIntent = Intent(context, AppGridActivity::class.java).let {
