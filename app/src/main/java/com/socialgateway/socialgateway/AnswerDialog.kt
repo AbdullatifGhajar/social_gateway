@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
-import com.socialgateway.socialgateway.AppGrid.Companion.userId
+import com.socialgateway.socialgateway.AppGridActivity.Companion.userId
 import socialgateway.socialgateway.R
 
 class AnswerDialog(

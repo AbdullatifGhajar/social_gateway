@@ -2,6 +2,7 @@ package com.socialgateway.socialgateway.ui.login
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -13,6 +14,7 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.socialgateway.socialgateway.AppGridActivity
 import socialgateway.socialgateway.R
 import socialgateway.socialgateway.databinding.ActivityLogin2Binding
 
@@ -60,6 +62,7 @@ class LoginActivity : AppCompatActivity() {
             if (loginResult.success != null) {
                 updateUiWithUser(loginResult.success)
                 setUserId(loginResult.success)
+                startActivity(Intent(this, AppGridActivity::class.java))
             }
             setResult(Activity.RESULT_OK)
 

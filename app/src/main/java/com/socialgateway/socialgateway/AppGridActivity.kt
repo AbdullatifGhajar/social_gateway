@@ -30,7 +30,7 @@ fun today(): String {
 
 enum class IntentCategory { AskQuestion, Reflection }
 
-class AppGrid : AppCompatActivity() {
+class AppGridActivity : AppCompatActivity() {
 
 
     companion object {
@@ -127,20 +127,24 @@ class AppGrid : AppCompatActivity() {
 
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.social_apps_grid)
-
-        createNotificationChannel(this)
-
+    private fun authenticateUser(){
         preferences = getSharedPreferences("login", Context.MODE_PRIVATE)
         userId = preferences.getString("userId", "").toString()
 
         if(userId.isEmpty())
         {
             startActivity(Intent(this, LoginActivity::class.java))
-            // TODO prevent user from clicking on back button
+            finish()
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        authenticateUser()
+
+        setContentView(R.layout.social_apps_grid)
+        createNotificationChannel(this)
 
         findViewById<GridView>(R.id.social_apps_grid).adapter =
             SocialAppAdapter(this) { _, socialApp ->
