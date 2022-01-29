@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.os.Looper
 import android.text.format.DateFormat
 import android.util.Log
 import android.widget.GridView
@@ -15,7 +14,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.socialgateway.socialgateway.ui.login.LoginActivity
 import socialgateway.socialgateway.R
-import java.net.ConnectException
 import java.net.UnknownHostException
 import java.util.*
 import java.util.Calendar.*
@@ -43,28 +41,21 @@ class AppGridActivity : AppCompatActivity() {
         socialApp: SocialApp,
         promptType: PromptType = PromptType.NORMAL
     ): Prompt? {
-        // make sure network request is not done on UI thread???
-        assert(Looper.myLooper() != Looper.getMainLooper())
-
-        ServerInterface(this).getPrompt(socialApp, promptType)
-
         try {
-            return ServerInterface(this).getPrompt(socialApp, promptType)
+            return ServerInterface.getPrompt(socialApp, promptType)
         } catch (exception: Exception) {
             val errorMessage = resources.getString(
                 when (exception) {
-                    is ConnectException -> R.string.server_unreachable
+                    is ServerException -> R.string.server_unreachable
                     is UnknownHostException -> R.string.no_internet_connection_available
                     else -> R.string.unknown_error
                 }
             )
-            runOnUiThread {
-                Toast.makeText(
-                    this,
-                    errorMessage,
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
+            Toast.makeText(
+                this,
+                errorMessage,
+                Toast.LENGTH_SHORT
+            ).show()
             log("could not request prompt: ${exception.message.orEmpty()}")
         }
         return null
@@ -113,26 +104,19 @@ class AppGridActivity : AppCompatActivity() {
         } */
 
 
-        Thread {
-            val prompt = requestPrompt(socialApp)
-            if (prompt == null) {
-                startApp(socialApp)
-            } else {
-                runOnUiThread {
-                    showResponseDialog(prompt, socialApp)
-                }
-            }
-        }.start()
-
-
+        val prompt = requestPrompt(socialApp)
+        if (prompt == null) {
+            startApp(socialApp)
+        } else {
+            showResponseDialog(prompt, socialApp)
+        }
     }
 
-    private fun authenticateUser(){
+    private fun authenticateUser() {
         preferences = getSharedPreferences("login", Context.MODE_PRIVATE)
         userId = preferences.getString("userId", "").toString()
 
-        if(userId.isEmpty())
-        {
+        if (userId.isEmpty()) {
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
         }
