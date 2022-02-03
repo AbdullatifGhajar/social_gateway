@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name" translatable="false">SocialGateway</string>
+    <string name="app_name" translatable="false">Social Gateway</string>
     <string name="notificationChannelId" translatable="false">SocialGatewayChannelId</string>
     <string name="serverUrlPath" translatable="false">https://hpi.de/baudisch/projects/neo4j/api</string>
 
@@ -18,7 +18,7 @@
     <string name="no_internet_connection_available">no internet connection available</string>
     <string name="unknown_error">unknown error</string>
     <string name="voice_recorder">voice recorder</string>
-    <string name="title_activity_login">LoginActivity</string>
+    <string name="title_activity_login">Login</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
     <string name="action_sign_in">Sign in or register</string>

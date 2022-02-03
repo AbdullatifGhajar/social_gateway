@@ -19,4 +19,13 @@
     <string name="no_internet_connection_available">keine Internetverbindung verfügbar</string>
     <string name="unknown_error">unbekannter Fehler</string>
     <string name="voice_recorder">Stimmenaufnahme</string>
+    <string name="title_activity_login">Einloggen</string>
+    <string name="prompt_email">Emailadresse</string>
+    <string name="prompt_password">Passwort</string>
+    <string name="action_sign_in">Einloggen oder Registrieren</string>
+    <string name="action_sign_in_short">Einloggen</string>
+    <string name="welcome">Hallo !</string>
+    <string name="invalid_email">invalide Emailaddresse</string>
+    <string name="invalid_password">4 Zeichen mindestens</string>
+    <string name="login_failed">Einloggen fehlgeschlagen</string>
 </resources>
