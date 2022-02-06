@@ -5,7 +5,7 @@ import socialgateway.socialgateway.R
 class SocialApp(
     val name: String,
     val packageName: String,
-    val imageId: Int
+    val icon: Int
 )
 // remember to include every app in manifest
 val SocialApps = listOf(

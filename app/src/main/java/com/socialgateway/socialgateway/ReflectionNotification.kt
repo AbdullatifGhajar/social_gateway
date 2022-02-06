@@ -19,8 +19,7 @@ class ReflectionNotification : BroadcastReceiver() {
                 context,
                 reflectionIntent,
                 context.resources.getString(R.string.reflection_question),
-                prompt.content,
-                "reflection"
+                prompt.content
             )
         )
     }

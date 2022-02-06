@@ -6,8 +6,10 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.Icon
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.graphics.drawable.IconCompat
 import socialgateway.socialgateway.R
 
 
@@ -16,8 +18,24 @@ class NotificationAttributes(
     val intent: Intent,
     val title: String,
     val text: String,
-    val type: String
-)
+    val icon: IconCompat = IconCompat.createWithResource(context, R.drawable.ic_notification_icon)
+) {
+    companion object {
+        operator fun invoke(
+            context: Context,
+            intent: Intent,
+            title: String,
+            text: String,
+            icon: Icon
+        ) = NotificationAttributes(
+            context,
+            intent,
+            title,
+            text,
+            IconCompat.createFromIcon(context, icon)!!
+        )
+    }
+}
 
 class Notifier {
     companion object {
@@ -26,16 +44,16 @@ class Notifier {
                 try {
                     val pendingIntent = PendingIntent.getActivity(
                         attributes.context,
-                        attributes.type.hashCode(),
+                        "NotificationSocialGateway".hashCode(),
                         attributes.intent,
-                        PendingIntent.FLAG_CANCEL_CURRENT
+                        PendingIntent.FLAG_IMMUTABLE
                     )
 
                     val builder = NotificationCompat.Builder(
                         attributes.context,
                         attributes.context.getString(R.string.notificationChannelId)
                     )
-                        .setSmallIcon(R.drawable.ic_notification_icon)
+                        .setSmallIcon(attributes.icon)
                         .setContentTitle(attributes.title)
                         .setContentText(attributes.text)
                         .setStyle(NotificationCompat.BigTextStyle().bigText(attributes.text))

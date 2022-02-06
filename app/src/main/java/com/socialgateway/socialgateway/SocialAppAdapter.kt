@@ -22,7 +22,7 @@ class SocialAppAdapter(
             context.packageManager.getLaunchIntentForPackage(socialApp.packageName) != null
 
         return imageView.apply {
-            setImageResource(socialApp.imageId)
+            setImageResource(socialApp.icon)
             scaleX = 0.9f
             scaleY = 0.9f
             if (!isInstalled) {

@@ -38,7 +38,7 @@ class SocialGatewayWidgetProvider : AppWidgetProvider() {
             }
 
             RemoteViews(context.packageName, R.layout.widget).let {
-                it.setImageViewResource(R.id.widget_button, socialApp.imageId)
+                it.setImageViewResource(R.id.widget_button, socialApp.icon)
                 it.setOnClickPendingIntent(R.id.widget_button, pendingIntent)
 
                 appWidgetManager.updateAppWidget(appWidgetId, it)
