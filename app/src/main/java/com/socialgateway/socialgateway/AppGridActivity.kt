@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.provider.Settings
 import android.text.format.DateFormat
 import android.util.Log
 import android.widget.GridView
@@ -18,6 +19,7 @@ import java.net.UnknownHostException
 import java.util.*
 import java.util.Calendar.*
 
+
 fun log(message: String) {
     Log.d("SocialGateway", message)
 }
@@ -26,11 +28,9 @@ fun today(): String {
     return DateFormat.format("dd.MM.yyyy", Date()) as String
 }
 
-enum class IntentCategory { AskQuestion, Reflection }
+enum class IntentCategory { AskQuestion, Reflection, OpenApp }
 
 class AppGridActivity : AppCompatActivity() {
-
-
     companion object {
         lateinit var userId: String
     }
@@ -122,18 +122,35 @@ class AppGridActivity : AppCompatActivity() {
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    private fun configureNotifications() {
+        Notifier.createNotificationChannel(this)
 
-        authenticateUser()
+        val listeners = Settings.Secure.getString(contentResolver, "enabled_notification_listeners")
+        if (listeners == null || !listeners.contains(packageName)) {
+            Toast.makeText(
+                this,
+                "Scroll down to Social Gateway and activate it",
+                Toast.LENGTH_SHORT
+            ).show()
+            startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+            finish()
+        }
+    }
 
+    private fun renderAppGrid() {
         setContentView(R.layout.social_apps_grid)
-        createNotificationChannel(this)
-
         findViewById<GridView>(R.id.social_apps_grid).adapter =
             SocialAppAdapter(this) { _, socialApp ->
                 chooseApp(socialApp)
             }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        authenticateUser()
+        configureNotifications()
+        renderAppGrid()
 
         intent?.extras?.let { intent ->
 
@@ -146,6 +163,11 @@ class AppGridActivity : AppCompatActivity() {
                 IntentCategory.Reflection -> {
                     val prompt = Prompt(intent.getString("question").orEmpty(), true)
                     showResponseDialog(prompt, null)
+                }
+                IntentCategory.OpenApp -> {
+                    chooseApp(
+                        SocialApps.first { it.name == intent.getString("socialAppName") }
+                    )
                 }
                 else -> {
                     // do nothing
