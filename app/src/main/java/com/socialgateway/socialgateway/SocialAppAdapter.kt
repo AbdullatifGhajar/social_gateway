@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ImageView
+import com.socialgateway.socialgateway.data.model.SocialApp
+import com.socialgateway.socialgateway.data.model.SocialApps
 
 
 class SocialAppAdapter(

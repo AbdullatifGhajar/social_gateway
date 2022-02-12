@@ -14,7 +14,7 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.socialgateway.socialgateway.AppGridActivity
+import com.socialgateway.socialgateway.ui.AppGridActivity
 import socialgateway.socialgateway.R
 import socialgateway.socialgateway.databinding.ActivityLogin2Binding
 

@@ -35,7 +35,7 @@
             android:label="@string/title_activity_login"
             android:noHistory="true" />
         <activity
-            android:name="com.socialgateway.socialgateway.AppGridActivity"
+            android:name="com.socialgateway.socialgateway.ui.AppGridActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -43,32 +43,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="com.socialgateway.socialgateway.SocialGatewayWidgetConfigurationActivity"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
-            </intent-filter>
-        </activity>
 
         <receiver
-            android:name="com.socialgateway.socialgateway.SocialGatewayWidgetProvider"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/appwidget_info" />
-        </receiver>
-        <receiver
-            android:name="com.socialgateway.socialgateway.ReflectionNotification"
+            android:name="com.socialgateway.socialgateway.notifications.ReflectionNotification"
             android:enabled="true"
             android:exported="false" />
 
         <service
-            android:name="com.socialgateway.socialgateway.NotificationListener"
+            android:name="com.socialgateway.socialgateway.notifications.NotificationListener"
             android:exported="false"
             android:label="NotificationListener"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">

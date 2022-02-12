@@ -1,4 +1,4 @@
-package com.socialgateway.socialgateway
+package com.socialgateway.socialgateway.ui
 
 import android.Manifest.permission.RECORD_AUDIO
 import android.app.Activity

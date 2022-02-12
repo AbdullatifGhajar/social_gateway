@@ -1,8 +1,12 @@
-package com.socialgateway.socialgateway
+package com.socialgateway.socialgateway.notifications
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import com.socialgateway.socialgateway.ui.AppGridActivity
+import com.socialgateway.socialgateway.ui.IntentCategory
+import com.socialgateway.socialgateway.data.model.PromptType
+import com.socialgateway.socialgateway.ServerInterface
 import socialgateway.socialgateway.R
 
 class ReflectionNotification : BroadcastReceiver() {

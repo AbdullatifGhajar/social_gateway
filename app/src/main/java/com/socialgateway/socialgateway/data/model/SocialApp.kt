@@ -1,4 +1,4 @@
-package com.socialgateway.socialgateway
+package com.socialgateway.socialgateway.data.model
 
 import socialgateway.socialgateway.R
 
@@ -19,7 +19,7 @@ val SocialApps = listOf(
     SocialApp("WhatsApp", "com.whatsapp", R.drawable.whatsapp),
     SocialApp("Facebook", "com.facebook.katana", R.drawable.facebook),
     SocialApp("Facebook Messenger", "com.facebook.orca", R.drawable.facebook_messenger),
-    SocialApp("Youtube", "com.google.android.youtube", R.drawable.youtube)
-    // SocialApp("Telegram", "org.telegram.messenger", R.drawable.telegram),
-    // SocialApp("Signal", "org.thoughtcrime.securesms", R.drawable.signal)
+    SocialApp("Youtube", "com.google.android.youtube", R.drawable.youtube),
+    SocialApp("Telegram", "org.telegram.messenger", R.drawable.telegram),
+    SocialApp("Signal", "org.thoughtcrime.securesms", R.drawable.signal)
 )

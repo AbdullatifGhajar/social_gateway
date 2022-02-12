@@ -1,4 +1,4 @@
-package com.socialgateway.socialgateway
+package com.socialgateway.socialgateway.ui
 
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -13,6 +13,15 @@ import android.util.Log
 import android.widget.GridView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.socialgateway.socialgateway.ServerException
+import com.socialgateway.socialgateway.ServerInterface
+import com.socialgateway.socialgateway.SocialAppAdapter
+import com.socialgateway.socialgateway.data.model.Prompt
+import com.socialgateway.socialgateway.data.model.PromptType
+import com.socialgateway.socialgateway.data.model.SocialApp
+import com.socialgateway.socialgateway.data.model.SocialApps
+import com.socialgateway.socialgateway.notifications.Notifier
+import com.socialgateway.socialgateway.notifications.ReflectionNotification
 import com.socialgateway.socialgateway.ui.login.LoginActivity
 import socialgateway.socialgateway.R
 import java.net.UnknownHostException

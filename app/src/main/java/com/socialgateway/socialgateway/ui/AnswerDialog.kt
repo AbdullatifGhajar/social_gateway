@@ -1,4 +1,4 @@
-package com.socialgateway.socialgateway
+package com.socialgateway.socialgateway.ui
 
 import android.app.Activity
 import android.app.AlertDialog
@@ -6,7 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
-import com.socialgateway.socialgateway.AppGridActivity.Companion.userId
+import com.socialgateway.socialgateway.ui.AppGridActivity.Companion.userId
+import com.socialgateway.socialgateway.data.model.Prompt
+import com.socialgateway.socialgateway.ServerInterface
+import com.socialgateway.socialgateway.data.model.SocialApp
 import socialgateway.socialgateway.R
 
 class AnswerDialog(

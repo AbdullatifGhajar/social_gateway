@@ -1,6 +1,9 @@
 package com.socialgateway.socialgateway
 
 import com.socialgateway.socialgateway.data.model.LoggedInUser
+import com.socialgateway.socialgateway.data.model.Prompt
+import com.socialgateway.socialgateway.data.model.PromptType
+import com.socialgateway.socialgateway.data.model.SocialApp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking

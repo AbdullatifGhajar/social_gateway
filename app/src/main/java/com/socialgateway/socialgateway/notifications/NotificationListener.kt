@@ -1,8 +1,11 @@
-package com.socialgateway.socialgateway
+package com.socialgateway.socialgateway.notifications
 
 import android.content.Intent
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
+import com.socialgateway.socialgateway.ui.AppGridActivity
+import com.socialgateway.socialgateway.ui.IntentCategory
+import com.socialgateway.socialgateway.data.model.SocialApps
 
 
 class NotificationListener : NotificationListenerService() {

@@ -1,4 +1,4 @@
-package com.socialgateway.socialgateway
+package com.socialgateway.socialgateway.notifications
 
 import android.app.Activity
 import android.app.NotificationChannel
