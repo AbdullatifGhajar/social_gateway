@@ -126,7 +126,7 @@ class AppGridActivity : AppCompatActivity() {
         if (listeners == null || !listeners.contains(packageName)) {
             Toast.makeText(
                 this,
-                "Scroll down to Social Gateway and activate it",
+                R.string.grant_access,
                 Toast.LENGTH_LONG
             ).show()
             startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))

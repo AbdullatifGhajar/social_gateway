@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name" translatable="false">Social Gateway</string>
+    <string name="app_name" translatable="false">Locus</string>
     <string name="notificationChannelId" translatable="false">SocialGatewayChannelId</string>
     <string name="serverUrlPath" translatable="false">https://hpi.de/baudisch/projects/neo4j/api</string>
 
@@ -27,4 +27,5 @@
     <string name="invalid_email">Not a valid email</string>
     <string name="invalid_password">Password must be >3 characters</string>
     <string name="login_failed">"Login failed"</string>
+    <string name="grant_access">Grant Access to Locus</string>
 </resources>

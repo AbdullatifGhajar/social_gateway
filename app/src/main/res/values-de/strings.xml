@@ -28,4 +28,5 @@
     <string name="invalid_email">invalide Emailaddresse</string>
     <string name="invalid_password">4 Zeichen mindestens</string>
     <string name="login_failed">Einloggen fehlgeschlagen</string>
+    <string name="grant_access">Locus Zugriff geben</string>
 </resources>
