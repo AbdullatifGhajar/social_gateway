@@ -11,21 +11,23 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.graphics.drawable.IconCompat
 import socialgateway.socialgateway.R
+import java.security.MessageDigest
+import kotlin.text.Charsets.UTF_8
 
 
 class NotificationAttributes(
     val context: Context,
     val intent: Intent,
-    val title: String,
-    val text: String,
+    val title: String?,
+    val text: String?,
     val icon: IconCompat = IconCompat.createWithResource(context, R.drawable.ic_notification_icon)
 ) {
     companion object {
         operator fun invoke(
             context: Context,
             intent: Intent,
-            title: String,
-            text: String,
+            title: String?,
+            text: String?,
             icon: Icon
         ) = NotificationAttributes(
             context,
@@ -34,6 +36,17 @@ class NotificationAttributes(
             text,
             IconCompat.createFromIcon(context, icon)!!
         )
+    }
+
+    fun hash(): Int {
+        val str = title + text
+        val hashBytes = MessageDigest.getInstance("MD5").digest(str.toByteArray(UTF_8))
+
+        var hash = 0
+        for (i in hashBytes.indices)
+            hash = (hash or (hashBytes[i].toInt() shl 8 * i)) % Int.MAX_VALUE
+
+        return hash
     }
 }
 
@@ -61,10 +74,8 @@ class Notifier {
                         .setContentIntent(pendingIntent)
                         .setAutoCancel(true)
 
-                    // notificationId is a unique int for each notification that you must define
-                    val notificationId = System.currentTimeMillis() % Int.MAX_VALUE
                     with(NotificationManagerCompat.from(attributes.context)) {
-                        notify(notificationId.toInt(), builder.build())
+                        notify(attributes.hash(), builder.build())
                     }
                 } catch (e: Exception) {
                     // something went wrong, don't do a notification
