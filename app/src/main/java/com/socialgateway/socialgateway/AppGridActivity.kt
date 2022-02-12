@@ -145,11 +145,35 @@ class AppGridActivity : AppCompatActivity() {
             }
     }
 
+    private fun scheduleReflectionNotification(hour: Int, minute: Int) {
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val dailyTriggerTime = getInstance().apply {
+            set(HOUR_OF_DAY, hour)
+            set(MINUTE, minute)
+        }.timeInMillis
+
+        val pendingIntent = getBroadcast(
+            this,
+            0,
+            Intent(this, ReflectionNotification::class.java),
+            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        alarmManager.setRepeating(
+            AlarmManager.RTC_WAKEUP,
+            dailyTriggerTime,
+            AlarmManager.INTERVAL_DAY,
+            pendingIntent
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         authenticateUser()
         configureNotifications()
+        scheduleReflectionNotification(21, 0)
+
         renderAppGrid()
 
         intent?.extras?.let { intent ->
@@ -170,42 +194,11 @@ class AppGridActivity : AppCompatActivity() {
                     )
                 }
                 else -> {
-                    // do nothing
+
                 }
             }
         }
-
         // sendBroadcast(Intent(this, ReflectionNotification::class.java))
-
-        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val dailyTriggerTime = getInstance().apply {
-            set(HOUR_OF_DAY, 21)
-            set(MINUTE, 0)
-            set(SECOND, 0)
-        }.timeInMillis
-
-        val pendingIntent = getBroadcast(
-            this,
-            0,
-            Intent(this, ReflectionNotification::class.java),
-            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_CANCEL_CURRENT
-        )
-
-        alarmManager.setRepeating(
-            AlarmManager.RTC_WAKEUP,
-            dailyTriggerTime,
-            AlarmManager.INTERVAL_DAY,
-            pendingIntent
-        )
-    }
-
-    override fun onPause() {
-        // TODO: why?
-        super.onPause()
-        preferences.edit().apply {
-            putString("userId", userId)
-            apply()
-        }
     }
 }
 

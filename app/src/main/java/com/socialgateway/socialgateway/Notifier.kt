@@ -57,7 +57,7 @@ class Notifier {
                 try {
                     val pendingIntent = PendingIntent.getActivity(
                         attributes.context,
-                        "NotificationSocialGateway".hashCode(),
+                        attributes.text.hashCode(),
                         attributes.intent,
                         PendingIntent.FLAG_IMMUTABLE
                     )
