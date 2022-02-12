@@ -1,4 +1,4 @@
-package com.socialgateway.socialgateway
+package com.socialgateway.socialgateway.ui
 
 import android.content.Context
 import android.view.MotionEvent
@@ -20,14 +20,11 @@ class SocialAppAdapter(
             adjustViewBounds = true // otherwise icons will be far from each other
         }
 
-        val isInstalled =
-            context.packageManager.getLaunchIntentForPackage(socialApp.packageName) != null
-
         return imageView.apply {
             setImageResource(socialApp.icon)
             scaleX = 0.9f
             scaleY = 0.9f
-            if (!isInstalled) {
+            if (!socialApp.isInstalled()) {
                 alpha = 0.5f
             }
             this.setOnClickListener(null)
@@ -37,7 +34,8 @@ class SocialAppAdapter(
                         v.scaleY = 1f
                         v.scaleX = 1f
                         v.performClick()
-                        onClick(context, socialApp)
+                        if (socialApp.isInstalled())
+                            onClick(context, socialApp)
                     }
                     MotionEvent.ACTION_UP -> {
                         v.scaleY = 0.9f

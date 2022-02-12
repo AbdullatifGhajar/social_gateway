@@ -1,12 +1,18 @@
 package com.socialgateway.socialgateway.data.model
 
+import com.socialgateway.socialgateway.SocialGatewayApp
 import socialgateway.socialgateway.R
 
 class SocialApp(
     val name: String,
     val packageName: String,
     val icon: Int
-)
+) {
+    fun isInstalled(): Boolean {
+        return SocialGatewayApp.instance?.packageManager?.getLaunchIntentForPackage(packageName) != null
+    }
+}
+
 // remember to include every app in manifest
 val SocialApps = listOf(
     SocialApp("Snapchat", "com.snapchat.android", R.drawable.snapchat),

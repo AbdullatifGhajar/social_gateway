@@ -15,7 +15,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.socialgateway.socialgateway.ServerException
 import com.socialgateway.socialgateway.ServerInterface
-import com.socialgateway.socialgateway.SocialAppAdapter
 import com.socialgateway.socialgateway.data.model.Prompt
 import com.socialgateway.socialgateway.data.model.PromptType
 import com.socialgateway.socialgateway.data.model.SocialApp
@@ -79,10 +78,6 @@ class AppGridActivity : AppCompatActivity() {
         return (preferences.getString("last_prompt:${socialApp.name}", "") != today())
     }
 
-    private fun isInstalled(socialApp: SocialApp): Boolean {
-        return packageManager.getLaunchIntentForPackage(socialApp.packageName) != null
-    }
-
     private fun showResponseDialog(prompt: Prompt, socialApp: SocialApp?) {
         AnswerDialog(this, socialApp, prompt,
             onSubmit = {
@@ -99,13 +94,6 @@ class AppGridActivity : AppCompatActivity() {
     }
 
     private fun chooseApp(socialApp: SocialApp) {
-        if (!isInstalled(socialApp)) {
-            resources.getString(R.string.X_was_not_found_on_your_device, socialApp.name).let {
-                Toast.makeText(this, it, Toast.LENGTH_LONG).show()
-            }
-            return
-        }
-
         /*
         if (!shouldReceivePrompt(socialApp)) {
             startApp(socialApp)
@@ -139,7 +127,7 @@ class AppGridActivity : AppCompatActivity() {
             Toast.makeText(
                 this,
                 "Scroll down to Social Gateway and activate it",
-                Toast.LENGTH_SHORT
+                Toast.LENGTH_LONG
             ).show()
             startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
             finish()
