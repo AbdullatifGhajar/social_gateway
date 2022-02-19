@@ -8,13 +8,13 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.provider.Settings
-import android.text.format.DateFormat
 import android.util.Log
 import android.widget.GridView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.socialgateway.socialgateway.ServerException
 import com.socialgateway.socialgateway.ServerInterface
+import com.socialgateway.socialgateway.SocialGatewayApp
 import com.socialgateway.socialgateway.data.model.Prompt
 import com.socialgateway.socialgateway.data.model.PromptType
 import com.socialgateway.socialgateway.data.model.SocialApp
@@ -24,16 +24,11 @@ import com.socialgateway.socialgateway.notifications.ReflectionNotification
 import com.socialgateway.socialgateway.ui.login.LoginActivity
 import socialgateway.socialgateway.R
 import java.net.UnknownHostException
-import java.util.*
 import java.util.Calendar.*
 
 
 fun log(message: String) {
     Log.d("SocialGateway", message)
-}
-
-fun today(): String {
-    return DateFormat.format("dd.MM.yyyy", Date()) as String
 }
 
 enum class IntentCategory { AskQuestion, Reflection, OpenApp }
@@ -73,32 +68,21 @@ class AppGridActivity : AppCompatActivity() {
         startActivity(packageManager.getLaunchIntentForPackage(socialApp.packageName))
     }
 
-    // check if the user already a prompt for this app today
-    private fun shouldReceivePrompt(socialApp: SocialApp): Boolean {
-        return (preferences.getString("last_prompt:${socialApp.name}", "") != today())
-    }
-
     private fun showResponseDialog(prompt: Prompt, socialApp: SocialApp?) {
         AnswerDialog(this, socialApp, prompt,
             onSubmit = {
                 if (socialApp != null) {
                     startApp(socialApp)
-                    // log this for shouldReceivePrompt later
-                    preferences.edit().apply {
-                        putString("last_prompt:${socialApp.name}", today())
-                        putString("lastPromptDate", today())
-                        apply()
-                    }
+                    SocialGatewayApp.logPrompt(socialApp)
                 }
             }, onCancel = { })
     }
 
     private fun chooseApp(socialApp: SocialApp) {
-        /*
-        if (!shouldReceivePrompt(socialApp)) {
+        if (!SocialGatewayApp.shouldReceivePrompt(socialApp)) {
             startApp(socialApp)
             return
-        } */
+        }
 
 
         val prompt = requestPrompt(socialApp)

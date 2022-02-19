@@ -19,9 +19,8 @@ class ServerException(message: String) : Exception(message)
 
 class ServerInterface {
     companion object {
-        private val key: String = SocialGatewayApp.resources!!.getString(R.string.KEY)
-        private val serverUrlPath: String =
-            SocialGatewayApp.resources!!.getString(R.string.serverUrlPath)
+        private val key = SocialGatewayApp.resources.getString(R.string.KEY)
+        private val serverUrlPath = SocialGatewayApp.resources.getString(R.string.serverUrlPath)
 
         private fun getFromServer(route: String, arguments: String = ""): JSONObject {
             var responseBody = ""
