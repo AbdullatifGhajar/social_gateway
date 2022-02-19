@@ -71,15 +71,13 @@ class AnswerDialog(
                 if (prompt.answerable) {
                     when (dialogType) {
                         "recording" -> ServerInterface.sendAudioAnswer(
-                            // TODO KATIE how should check-in work
-                            socialApp?.name ?: "check-in",
+                            socialApp?.name ?: "reflection",
                             userId,
                             prompt.content,
                             recorder!!.recordingFile()
                         )
                         "typing" -> ServerInterface.sendTextAnswer(
-                            // TODO KATIE how should check-in work
-                            socialApp?.name ?: "check-in",
+                            socialApp?.name ?: "reflection",
                             userId,
                             prompt.content,
                             typingLayout.findViewById<TextView>(R.id.answer_edit_text).text.toString()
