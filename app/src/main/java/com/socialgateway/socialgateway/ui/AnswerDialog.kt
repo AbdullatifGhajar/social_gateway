@@ -2,14 +2,13 @@ package com.socialgateway.socialgateway.ui
 
 import android.app.Activity
 import android.app.AlertDialog
-import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
-import com.socialgateway.socialgateway.ui.AppGridActivity.Companion.userId
-import com.socialgateway.socialgateway.data.model.Prompt
 import com.socialgateway.socialgateway.ServerInterface
+import com.socialgateway.socialgateway.data.model.Prompt
 import com.socialgateway.socialgateway.data.model.SocialApp
+import com.socialgateway.socialgateway.ui.AppGridActivity.Companion.userId
 import socialgateway.socialgateway.R
 
 class AnswerDialog(
@@ -20,9 +19,8 @@ class AnswerDialog(
     private val onCancel: () -> Unit
 ) {
 
-    private val typingLayout: View = activity.layoutInflater.inflate(R.layout.typing_dialog, null)
-    private val recordingLayout: View =
-        activity.layoutInflater.inflate(R.layout.recording_dialog, null)
+    private val typingLayout = activity.layoutInflater.inflate(R.layout.typing_dialog, null)
+    private val recordingLayout = activity.layoutInflater.inflate(R.layout.recording_dialog, null)
     private var recorder: VoiceRecorder? = null
     private lateinit var dialog: AlertDialog
     private var dialogType = "default"
@@ -70,22 +68,23 @@ class AnswerDialog(
                 onCancel()
             }
             setPositiveButton(android.R.string.ok) { _, _ ->
-                when (dialogType) {
-                    "recording" -> ServerInterface.sendAudioAnswer(
-                        // TODO KATIE how should check-in work
-                        socialApp?.name ?: "check-in",
-                        userId,
-                        prompt.content,
-                        recorder!!.recordingFile()
-                    )
-                    "typing" -> ServerInterface.sendTextAnswer(
-                        // TODO KATIE how should check-in work
-                        socialApp?.name ?: "check-in",
-                        userId,
-                        prompt.content,
-                        typingLayout.findViewById<TextView>(R.id.answer_edit_text).text.toString()
-                    )
-                    "default" -> {}
+                if (prompt.answerable) {
+                    when (dialogType) {
+                        "recording" -> ServerInterface.sendAudioAnswer(
+                            // TODO KATIE how should check-in work
+                            socialApp?.name ?: "check-in",
+                            userId,
+                            prompt.content,
+                            recorder!!.recordingFile()
+                        )
+                        "typing" -> ServerInterface.sendTextAnswer(
+                            // TODO KATIE how should check-in work
+                            socialApp?.name ?: "check-in",
+                            userId,
+                            prompt.content,
+                            typingLayout.findViewById<TextView>(R.id.answer_edit_text).text.toString()
+                        )
+                    }
                 }
                 onSubmit()
             }
