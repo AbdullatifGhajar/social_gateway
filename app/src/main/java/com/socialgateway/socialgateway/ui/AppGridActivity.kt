@@ -94,7 +94,7 @@ class AppGridActivity : AppCompatActivity() {
     }
 
     private fun authenticateUser() {
-        preferences = getSharedPreferences("login", Context.MODE_PRIVATE)
+        preferences = getSharedPreferences("com.socialgateway,socialgateway.login", Context.MODE_PRIVATE)
         userId = preferences.getString("userId", "").toString()
 
         if (userId.isEmpty()) {

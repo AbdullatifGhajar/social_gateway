@@ -17,7 +17,7 @@ class SocialGatewayApp : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
-        preferences = this.getSharedPreferences("prompt", Context.MODE_PRIVATE)
+        preferences = this.getSharedPreferences("com.socialgateway,socialgateway.prompt", Context.MODE_PRIVATE)
     }
 
     companion object {

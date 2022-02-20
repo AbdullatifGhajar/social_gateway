@@ -103,7 +103,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun setUserId(model: LoggedInUserView) {
-        val preferences = getSharedPreferences("login", Context.MODE_PRIVATE)
+        val preferences = getSharedPreferences("com.socialgateway,socialgateway.login", Context.MODE_PRIVATE)
         preferences.edit().apply {
             putString("userId", model.id)
             apply()
