@@ -46,10 +46,7 @@
             </intent-filter>
         </activity>
 
-        <receiver
-            android:name="com.socialgateway.socialgateway.notifications.ReflectionNotification"
-            android:enabled="true"
-            android:exported="false" />
+        <receiver android:name="com.socialgateway.socialgateway.notifications.ReflectionNotification" />
 
         <service
             android:name="com.socialgateway.socialgateway.notifications.NotificationListener"

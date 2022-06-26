@@ -1,8 +1,5 @@
 package com.socialgateway.socialgateway.ui
 
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.app.PendingIntent.getBroadcast
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -20,11 +17,10 @@ import com.socialgateway.socialgateway.data.model.PromptType
 import com.socialgateway.socialgateway.data.model.SocialApp
 import com.socialgateway.socialgateway.data.model.SocialApps
 import com.socialgateway.socialgateway.notifications.Notifier
-import com.socialgateway.socialgateway.notifications.ReflectionNotification
+import com.socialgateway.socialgateway.notifications.scheduleReflectionNotification
 import com.socialgateway.socialgateway.ui.login.LoginActivity
 import socialgateway.socialgateway.R
 import java.net.UnknownHostException
-import java.util.Calendar.*
 
 
 fun log(message: String) {
@@ -74,7 +70,8 @@ class AppGridActivity : AppCompatActivity() {
                 if (socialApp != null) {
                     startApp(socialApp)
                     SocialGatewayApp.logPrompt(socialApp)
-                }
+                } else
+                    SocialGatewayApp.logReflectionPrompt()
             }, onCancel = { })
     }
 
@@ -94,7 +91,8 @@ class AppGridActivity : AppCompatActivity() {
     }
 
     private fun authenticateUser() {
-        preferences = getSharedPreferences("com.socialgateway,socialgateway.login", Context.MODE_PRIVATE)
+        preferences =
+            getSharedPreferences("com.socialgateway,socialgateway.login", Context.MODE_PRIVATE)
         userId = preferences.getString("userId", "").toString()
 
         if (userId.isEmpty()) {
@@ -126,34 +124,13 @@ class AppGridActivity : AppCompatActivity() {
             }
     }
 
-    private fun scheduleReflectionNotification(hour: Int, minute: Int) {
-        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val dailyTriggerTime = getInstance().apply {
-            set(HOUR_OF_DAY, hour)
-            set(MINUTE, minute)
-        }.timeInMillis
-
-        val pendingIntent = getBroadcast(
-            this,
-            0,
-            Intent(this, ReflectionNotification::class.java),
-            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        alarmManager.setRepeating(
-            AlarmManager.RTC_WAKEUP,
-            dailyTriggerTime,
-            AlarmManager.INTERVAL_DAY,
-            pendingIntent
-        )
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         authenticateUser()
+
         configureNotifications()
-        scheduleReflectionNotification(21, 0)
+        scheduleReflectionNotification(this)
 
         renderAppGrid()
 

@@ -9,7 +9,7 @@ class SocialApp(
     val icon: Int
 ) {
     fun isInstalled(): Boolean {
-        return SocialGatewayApp.instance?.packageManager?.getLaunchIntentForPackage(packageName) != null
+        return SocialGatewayApp.instance.packageManager?.getLaunchIntentForPackage(packageName) != null
     }
 }
 

@@ -26,9 +26,14 @@ class SocialGatewayApp : Application() {
         val resources: Resources
             get() = instance.resources
 
-        // check if the user already a prompt for this app today
+        // check if the user already got a prompt for this app today
         fun shouldReceivePrompt(socialApp: SocialApp): Boolean {
             return (preferences.getString("lastPrompt:${socialApp.name}", "") != today())
+        }
+
+        // check if the user already got a reflection prompt today
+        fun shouldReceiveReflectionPrompt(): Boolean {
+            return (preferences.getString("lastReflectionPrompt", "") != today())
         }
 
         // log this for shouldReceivePrompt later
@@ -36,6 +41,13 @@ class SocialGatewayApp : Application() {
             preferences.edit().apply {
                 putString("lastPrompt:${socialApp.name}", today())
                 putString("lastPromptDate", today())
+                apply()
+            }
+        }
+
+        fun logReflectionPrompt(){
+            preferences.edit().apply {
+                putString("lastReflectionPrompt", today())
                 apply()
             }
         }
