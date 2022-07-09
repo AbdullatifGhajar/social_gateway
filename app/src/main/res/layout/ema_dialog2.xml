@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/linearLayoutCompat"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/eam_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="1dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10sp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/ema_question3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/ema_question3"
+                android:textSize="18sp" />
+
+            <LinearLayout
+                android:id="@+id/ema_answer3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <CheckBox
+                    android:id="@+id/ema_answer3_checkbox1"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:minHeight="48dp"
+                    android:text="Stressed, nervous, or overwhelmed" />
+
+                <CheckBox
+                    android:id="@+id/ema_answer3_checkbox2"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:minHeight="48dp"
+                    android:text="Sad, downhearted, or unhappy" />
+
+                <CheckBox
+                    android:id="@+id/ema_answer3_checkbox3"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:minHeight="48dp"
+                    android:text="Angry, irritated, or annoyed" />
+
+                <CheckBox
+                    android:id="@+id/ema_answer3_checkbox4"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:minHeight="32dp"
+                    android:text="Embarrassed, self-conscious, or blushing" />
+
+                <CheckBox
+                    android:id="@+id/ema_answer3_checkbox5"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:minHeight="48dp"
+                    android:text="Guilty, repentant, or blameworthy" />
+
+                <CheckBox
+                    android:id="@+id/ema_answer3_checkbox6"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:minHeight="48dp"
+                    android:text="Amused, fun-loving, or silly" />
+
+                <CheckBox
+                    android:id="@+id/ema_answer3_checkbox7"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:minHeight="48dp"
+                    android:text="Interested, alert, or curious" />
+
+                <CheckBox
+                    android:id="@+id/ema_answer3_checkbox8"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:minHeight="48dp"
+                    android:text="Proud, confident, or self-assured" />
+
+                <CheckBox
+                    android:id="@+id/ema_answer3_checkbox9"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:minHeight="48dp"
+                    android:text="Love, closeness, or trust" />
+
+                <CheckBox
+                    android:id="@+id/ema_answer3_checkbox10"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:minHeight="48dp"
+                    android:text="Joyful, glad, or happy" />
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/ema_question4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/ema_question4"
+                android:textSize="18sp" />
+
+            <EditText
+                android:id="@+id/ema_answer4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="@string/type_your_answer"
+                android:inputType="textCapSentences|textAutoCorrect"
+                android:minHeight="48dp"
+                android:textSize="15sp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

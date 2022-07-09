@@ -90,8 +90,8 @@ class ServerInterface {
         fun sendTextAnswer(
             appName: String,
             userId: String,
-            prompt: String,
-            answerText: String
+            question: String,
+            answer: String
         ) {
             postToServer(
                 "/answer",
@@ -100,8 +100,8 @@ class ServerInterface {
                     mapOf(
                         "user_id" to userId,
                         "app_name" to appName,
-                        "prompt" to prompt,
-                        "answer_text" to answerText
+                        "prompt" to question,
+                        "answer_text" to answer
                     )
                 ).toString().toByteArray()
             )

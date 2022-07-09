@@ -28,4 +28,9 @@
     <string name="invalid_password">Password must be >3 characters</string>
     <string name="login_failed">"Login failed"</string>
     <string name="grant_access">Grant Access to Locus</string>
+    <string name="ema_question1" translatable="false">1. What was the last social media platform you used today?</string>
+    <string name="type_your_answer" translatable="false">type your answer</string>
+    <string name="ema_question2" translatable="false">2. What were you doing/looking at?</string>
+    <string name="ema_question3" translatable="false">3. Which feelings did you feel most strongly during this social media session?</string>
+    <string name="ema_question4" translatable="false">4. What made you feel this way?</string>
 </resources>
