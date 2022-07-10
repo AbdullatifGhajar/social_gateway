@@ -4,6 +4,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Context.ALARM_SERVICE
 import android.content.Intent
 import com.socialgateway.socialgateway.ServerInterface
 import com.socialgateway.socialgateway.SocialGatewayApp
@@ -38,7 +39,7 @@ class ReflectionNotification : BroadcastReceiver() {
 fun scheduleReflectionNotification(context: Context){
     val hour = 21
     val minute = 0
-    val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+    val alarmManager = context.getSystemService(ALARM_SERVICE) as AlarmManager
     val dailyTriggerTime = Calendar.getInstance().apply {
         set(Calendar.HOUR_OF_DAY, hour)
         set(Calendar.MINUTE, minute)
@@ -48,7 +49,7 @@ fun scheduleReflectionNotification(context: Context){
         context,
         0,
         Intent(context, ReflectionNotification::class.java),
-        PendingIntent.FLAG_IMMUTABLE
+        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
     )
 
     alarmManager.setRepeating(

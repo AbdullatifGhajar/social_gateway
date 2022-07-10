@@ -47,6 +47,7 @@
         </activity>
 
         <receiver android:name="com.socialgateway.socialgateway.notifications.ReflectionNotification" />
+        <receiver android:name="com.socialgateway.socialgateway.notifications.EMANotification" />
 
         <service
             android:name="com.socialgateway.socialgateway.notifications.NotificationListener"

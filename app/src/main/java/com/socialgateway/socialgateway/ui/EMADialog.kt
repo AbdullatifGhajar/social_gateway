@@ -27,7 +27,7 @@ class EMADialog(
 
     private fun showDialog(index: Int) {
         dialog = AlertDialog.Builder(activity).apply {
-            setMessage("Reflection")
+            setMessage("EMA of the day")
             setView(layouts[index])
             setNegativeButton(android.R.string.cancel) { _, _ ->
                 onCancel()
@@ -36,7 +36,7 @@ class EMADialog(
                 if (index + 1 == layouts.size) {
                     onSubmit()
                     answers().forEach { (question, answer) ->
-                        ServerInterface.sendTextAnswer("reflection", userId, question, answer)
+                        ServerInterface.sendTextAnswer("ema", userId, question, answer)
                     }
                 } else {
                     showDialog(index + 1)

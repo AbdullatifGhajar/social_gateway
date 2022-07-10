@@ -17,6 +17,7 @@ import com.socialgateway.socialgateway.data.model.PromptType
 import com.socialgateway.socialgateway.data.model.SocialApp
 import com.socialgateway.socialgateway.data.model.SocialApps
 import com.socialgateway.socialgateway.notifications.Notifier
+import com.socialgateway.socialgateway.notifications.scheduleEMANotification
 import com.socialgateway.socialgateway.notifications.scheduleReflectionNotification
 import com.socialgateway.socialgateway.ui.login.LoginActivity
 import socialgateway.socialgateway.R
@@ -27,7 +28,7 @@ fun log(message: String) {
     Log.d("SocialGateway", message)
 }
 
-enum class IntentCategory { AskQuestion, Reflection, OpenApp }
+enum class IntentCategory { AskQuestion, Reflection, EMA, OpenApp }
 
 class AppGridActivity : AppCompatActivity() {
     companion object {
@@ -64,29 +65,25 @@ class AppGridActivity : AppCompatActivity() {
         startActivity(packageManager.getLaunchIntentForPackage(socialApp.packageName))
     }
 
-    private fun showResponseDialog(prompt: Prompt, socialApp: SocialApp?) {
-        AnswerDialog(this, socialApp, prompt,
-            onSubmit = {
-                if (socialApp != null) {
-                    startApp(socialApp)
-                    SocialGatewayApp.logPrompt(socialApp)
-                } else
-                    SocialGatewayApp.logReflectionPrompt()
-            }, onCancel = { })
-    }
-
     private fun chooseApp(socialApp: SocialApp) {
         if (!SocialGatewayApp.shouldReceivePrompt(socialApp)) {
             startApp(socialApp)
             return
         }
 
-
         val prompt = requestPrompt(socialApp)
         if (prompt == null) {
             startApp(socialApp)
         } else {
-            showResponseDialog(prompt, socialApp)
+            AnswerDialog(this, socialApp, prompt,
+                onSubmit = {
+                    startApp(socialApp)
+                    SocialGatewayApp.logPrompt(socialApp)
+                }, onCancel = { })
+        }
+
+        if (SocialGatewayApp.shouldReceiveEMAPrompt()) {
+            scheduleEMANotification(this)
         }
     }
 
@@ -135,7 +132,6 @@ class AppGridActivity : AppCompatActivity() {
         renderAppGrid()
 
         intent?.extras?.let { intent ->
-
             when (intent.getSerializable("intentCategory") as? IntentCategory) {
                 IntentCategory.AskQuestion -> {
                     chooseApp(
@@ -144,7 +140,15 @@ class AppGridActivity : AppCompatActivity() {
                 }
                 IntentCategory.Reflection -> {
                     val prompt = Prompt(intent.getString("question").orEmpty(), true)
-                    showResponseDialog(prompt, null)
+                    AnswerDialog(this, null, prompt,
+                        onSubmit = {
+                            SocialGatewayApp.logReflectionPrompt()
+                        }, onCancel = { })
+                }
+                IntentCategory.EMA -> {
+                    EMADialog(this, onSubmit = {
+                        SocialGatewayApp.logEMAPrompt()
+                    }, onCancel = { })
                 }
                 IntentCategory.OpenApp -> {
                     chooseApp(

@@ -17,7 +17,10 @@ class SocialGatewayApp : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
-        preferences = this.getSharedPreferences("com.socialgateway,socialgateway.prompt", Context.MODE_PRIVATE)
+        preferences = this.getSharedPreferences(
+            "com.socialgateway,socialgateway.prompt",
+            Context.MODE_PRIVATE
+        )
     }
 
     companion object {
@@ -36,6 +39,11 @@ class SocialGatewayApp : Application() {
             return (preferences.getString("lastReflectionPrompt", "") != today())
         }
 
+        // check if the user already got a reflection prompt today
+        fun shouldReceiveEMAPrompt(): Boolean {
+            return (preferences.getString("lastEMAPrompt", "") != today())
+        }
+
         // log this for shouldReceivePrompt later
         fun logPrompt(socialApp: SocialApp) {
             preferences.edit().apply {
@@ -45,9 +53,16 @@ class SocialGatewayApp : Application() {
             }
         }
 
-        fun logReflectionPrompt(){
+        fun logReflectionPrompt() {
             preferences.edit().apply {
                 putString("lastReflectionPrompt", today())
+                apply()
+            }
+        }
+
+        fun logEMAPrompt() {
+            preferences.edit().apply {
+                putString("lastEMAPrompt", today())
                 apply()
             }
         }
