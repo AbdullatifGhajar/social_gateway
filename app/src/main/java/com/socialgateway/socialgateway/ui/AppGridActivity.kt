@@ -130,6 +130,10 @@ class AppGridActivity : AppCompatActivity() {
         scheduleReflectionNotification(this)
         scheduleEMANotification(this)
 
+        EMADialog(this, onSubmit = {
+            SocialGatewayApp.logEMAPrompt()
+        }, onCancel = { })
+
         renderAppGrid()
 
         intent?.extras?.let { intent ->

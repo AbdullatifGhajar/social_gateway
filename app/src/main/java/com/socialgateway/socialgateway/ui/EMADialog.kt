@@ -2,9 +2,8 @@ package com.socialgateway.socialgateway.ui
 
 import android.app.Activity
 import android.app.AlertDialog
-import android.widget.CheckBox
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.media.Rating
+import android.widget.*
 import com.socialgateway.socialgateway.ServerInterface
 import com.socialgateway.socialgateway.SocialGatewayApp
 import com.socialgateway.socialgateway.ui.AppGridActivity.Companion.userId
@@ -17,7 +16,8 @@ class EMADialog(
 ) {
     private val layouts = listOf(
         activity.layoutInflater.inflate(R.layout.ema_dialog1, null),
-        activity.layoutInflater.inflate(R.layout.ema_dialog2, null)
+        activity.layoutInflater.inflate(R.layout.ema_dialog2, null),
+        activity.layoutInflater.inflate(R.layout.ema_dialog3, null),
     )
     private lateinit var dialog: AlertDialog
 
@@ -26,7 +26,7 @@ class EMADialog(
     }
 
     private fun showDialog(index: Int) {
-        dialog = AlertDialog.Builder(activity).apply {
+        dialog = AlertDialog.Builder(activity, R.style.AlertDialogStyle).apply {
             setMessage("EMA of the day")
             setView(layouts[index])
             setNegativeButton(android.R.string.cancel) { _, _ ->
@@ -52,6 +52,7 @@ class EMADialog(
         val question2 = SocialGatewayApp.resources.getString(R.string.ema_question2)
         val question3 = SocialGatewayApp.resources.getString(R.string.ema_question3)
         val question4 = SocialGatewayApp.resources.getString(R.string.ema_question4)
+        val question5 = SocialGatewayApp.resources.getString(R.string.ema_question5)
 
         // collect checked options of question 3 (the one with checkboxes)
         val answerView3 = layouts[1].findViewById<LinearLayout>(R.id.ema_answer3)
@@ -67,12 +68,14 @@ class EMADialog(
         val answer2 = layouts[0].findViewById<TextView>(R.id.ema_answer2).text.toString()
         val answer3 = checkedOptions.joinToString(separator = " & ")
         val answer4 = layouts[1].findViewById<TextView>(R.id.ema_answer4).text.toString()
+        val answer5 = layouts[2].findViewById<RatingBar>(R.id.ema_answer5).progress.toString()
 
         return mapOf(
             question1 to answer1,
             question2 to answer2,
             question3 to answer3,
             question4 to answer4,
+            question5 to answer5,
         )
     }
 }

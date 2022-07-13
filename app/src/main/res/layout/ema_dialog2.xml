@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
 
     <LinearLayout
-        android:id="@+id/eam_layout"
+        android:id="@+id/eam_layout2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="1dp"
@@ -22,13 +22,15 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10sp"
+            android:layout_gravity="center"
+            android:layout_margin="10sp"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/ema_question3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:text="@string/ema_question3"
                 android:textSize="18sp" />
 
@@ -39,11 +41,18 @@
                 android:orientation="vertical">
 
                 <CheckBox
-                    android:id="@+id/ema_answer3_checkbox1"
+                    android:id="@+id/ema_answer3_checkbox0"
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
                     android:minHeight="48dp"
                     android:text="Stressed, nervous, or overwhelmed" />
+
+                <CheckBox
+                    android:id="@+id/ema_answer3_checkbox1"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:minHeight="48dp"
+                    android:text="Bored, uninspired, or 'meh'" />
 
                 <CheckBox
                     android:id="@+id/ema_answer3_checkbox2"
@@ -115,12 +124,15 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_margin="10sp"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/ema_question4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:text="@string/ema_question4"
                 android:textSize="18sp" />
 
@@ -128,6 +140,7 @@
                 android:id="@+id/ema_answer4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:ems="10"
                 android:hint="@string/type_your_answer"
                 android:inputType="textCapSentences|textAutoCorrect"
