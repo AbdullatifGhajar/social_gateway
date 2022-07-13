@@ -85,10 +85,6 @@ class AppGridActivity : AppCompatActivity() {
                 }, onCancel = { })
         }
         SocialGatewayApp.logPrompt(socialApp)
-
-        if (SocialGatewayApp.shouldReceiveEMAPrompt()) {
-            scheduleEMANotification(this)
-        }
     }
 
     private fun authenticateUser() {
@@ -132,6 +128,7 @@ class AppGridActivity : AppCompatActivity() {
 
         configureNotifications()
         scheduleReflectionNotification(this)
+        scheduleEMANotification(this)
 
         renderAppGrid()
 
