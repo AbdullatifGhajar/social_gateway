@@ -39,9 +39,12 @@ class SocialGatewayApp : Application() {
             return (preferences.getString("lastReflectionPrompt", "") != today())
         }
 
-        // check if the user already got a reflection prompt today
+        // check if the user already got a reflection prompt today and the number of submitted EMAs is less than 7
         fun shouldReceiveEMAPrompt(): Boolean {
-            return (preferences.getString("lastEMAPrompt", "") != today())
+            return (preferences.getString(
+                "lastEMAPrompt",
+                ""
+            ) != today()) and (preferences.getInt("EMAsSubmitted", 0) < 7)
         }
 
         // check if this is the first time the app was opened today
@@ -68,6 +71,7 @@ class SocialGatewayApp : Application() {
         fun logEMAPrompt() {
             preferences.edit().apply {
                 putString("lastEMAPrompt", today())
+                putInt("EMAsSubmitted", preferences.getInt("EMAsSubmitted", 0) + 1)
                 apply()
             }
         }
