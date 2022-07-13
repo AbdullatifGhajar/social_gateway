@@ -44,11 +44,16 @@ class SocialGatewayApp : Application() {
             return (preferences.getString("lastEMAPrompt", "") != today())
         }
 
+        // check if this is the first time the app was opened today
+        fun isFirstTimeToday(): Boolean {
+            return (preferences.getString("lastPrompt", "") != today())
+        }
+
         // log this for shouldReceivePrompt later
         fun logPrompt(socialApp: SocialApp) {
             preferences.edit().apply {
                 putString("lastPrompt:${socialApp.name}", today())
-                putString("lastPromptDate", today())
+                putString("lastPrompt", today())
                 apply()
             }
         }

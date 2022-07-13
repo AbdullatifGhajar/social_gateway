@@ -71,16 +71,20 @@ class AppGridActivity : AppCompatActivity() {
             return
         }
 
-        val prompt = requestPrompt(socialApp)
+        val prompt = when (SocialGatewayApp.isFirstTimeToday()) {
+            true -> Prompt("What is your goal for social media today?", true)
+            else -> requestPrompt(socialApp)
+        }
+
         if (prompt == null) {
             startApp(socialApp)
         } else {
             AnswerDialog(this, socialApp, prompt,
                 onSubmit = {
                     startApp(socialApp)
-                    SocialGatewayApp.logPrompt(socialApp)
                 }, onCancel = { })
         }
+        SocialGatewayApp.logPrompt(socialApp)
 
         if (SocialGatewayApp.shouldReceiveEMAPrompt()) {
             scheduleEMANotification(this)
