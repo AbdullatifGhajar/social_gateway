@@ -1,9 +1,6 @@
 package com.socialgateway.socialgateway.notifications
 
-import android.app.Activity
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
+import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Icon
@@ -12,6 +9,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.graphics.drawable.IconCompat
 import socialgateway.socialgateway.R
 import java.security.MessageDigest
+import java.util.*
 import kotlin.text.Charsets.UTF_8
 
 
@@ -105,4 +103,26 @@ class Notifier {
             notificationManager.createNotificationChannel(channel)
         }
     }
+}
+
+fun scheduleNotification(context: Context, hour: Int, minute: Int, notificationClass: Class<*>) {
+    val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+    val dailyTriggerTime = Calendar.getInstance().apply {
+        set(Calendar.HOUR_OF_DAY, hour)
+        set(Calendar.MINUTE, minute)
+    }.timeInMillis
+
+    val pendingIntent = PendingIntent.getBroadcast(
+        context,
+        0,
+        Intent(context, notificationClass),
+        0,
+    )
+
+    alarmManager.setRepeating(
+        AlarmManager.RTC_WAKEUP,
+        dailyTriggerTime,
+        AlarmManager.INTERVAL_DAY,
+        pendingIntent
+    )
 }

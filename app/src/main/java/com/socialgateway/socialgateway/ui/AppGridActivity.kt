@@ -16,9 +16,10 @@ import com.socialgateway.socialgateway.data.model.Prompt
 import com.socialgateway.socialgateway.data.model.PromptType
 import com.socialgateway.socialgateway.data.model.SocialApp
 import com.socialgateway.socialgateway.data.model.SocialApps
+import com.socialgateway.socialgateway.notifications.EMANotification
 import com.socialgateway.socialgateway.notifications.Notifier
-import com.socialgateway.socialgateway.notifications.scheduleEMANotification
-import com.socialgateway.socialgateway.notifications.scheduleReflectionNotification
+import com.socialgateway.socialgateway.notifications.ReflectionNotification
+import com.socialgateway.socialgateway.notifications.scheduleNotification
 import com.socialgateway.socialgateway.ui.login.LoginActivity
 import socialgateway.socialgateway.R
 import java.net.UnknownHostException
@@ -28,7 +29,7 @@ fun log(message: String) {
     Log.d("SocialGateway", message)
 }
 
-enum class IntentCategory { AskQuestion, Reflection, EMA, OpenApp }
+enum class IntentCategory { AskQuestion, Reflection, EMA, OpenApp, LoginSucceeded }
 
 class AppGridActivity : AppCompatActivity() {
     companion object {
@@ -124,16 +125,8 @@ class AppGridActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        authenticateUser()
-
         configureNotifications()
-        scheduleReflectionNotification(this)
-        scheduleEMANotification(this)
-
-        EMADialog(this, onSubmit = {
-            SocialGatewayApp.logEMAPrompt()
-        }, onCancel = { })
-
+        authenticateUser()
         renderAppGrid()
 
         intent?.extras?.let { intent ->
@@ -160,11 +153,16 @@ class AppGridActivity : AppCompatActivity() {
                         SocialApps.first { it.name == intent.getString("socialAppName") }
                     )
                 }
+                IntentCategory.LoginSucceeded -> {
+                    scheduleNotification(this, 21, 0, ReflectionNotification::class.java)
+                    scheduleNotification(this, 12, 0, EMANotification::class.java)
+                }
                 else -> {
 
                 }
             }
         }
+
         // sendBroadcast(Intent(this, ReflectionNotification::class.java))
     }
 }

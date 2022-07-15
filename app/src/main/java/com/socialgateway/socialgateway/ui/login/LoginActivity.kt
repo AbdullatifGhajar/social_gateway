@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.socialgateway.socialgateway.ui.AppGridActivity
+import com.socialgateway.socialgateway.ui.IntentCategory
 import socialgateway.socialgateway.R
 import socialgateway.socialgateway.databinding.ActivityLogin2Binding
 
@@ -62,7 +63,11 @@ class LoginActivity : AppCompatActivity() {
             if (loginResult.success != null) {
                 updateUiWithUser(loginResult.success)
                 setUserId(loginResult.success)
-                startActivity(Intent(this, AppGridActivity::class.java))
+                startActivity(
+                    Intent(
+                        this,
+                        AppGridActivity::class.java
+                    ).apply { putExtra("intentCategory", IntentCategory.LoginSucceeded) })
                 //Complete and destroy login activity once successful
                 finish()
             }
@@ -103,7 +108,8 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun setUserId(model: LoggedInUserView) {
-        val preferences = getSharedPreferences("com.socialgateway,socialgateway.login", Context.MODE_PRIVATE)
+        val preferences =
+            getSharedPreferences("com.socialgateway,socialgateway.login", Context.MODE_PRIVATE)
         preferences.edit().apply {
             putString("userId", model.id)
             apply()
