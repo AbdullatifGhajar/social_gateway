@@ -34,4 +34,5 @@
     <string name="ema_question3" translatable="false">3. Which feelings did you feel most strongly during this social media session?</string>
     <string name="ema_question4" translatable="false">4. What made you feel this way?</string>
     <string name="ema_question5" translatable="false">5. How much did you feel in or out of control while using this social media platform? (1 less in control, 5 more in control)</string>
+    <string name="first_prompt_of_the_day" translatable="false">What is your goal for social media today?</string>
 </resources>

@@ -17,6 +17,9 @@ import java.util.*
 
 class ServerException(message: String) : Exception(message)
 
+/**
+ * A class that provides an interface for the server
+ */
 class ServerInterface {
     companion object {
         private val key = SocialGatewayApp.resources.getString(R.string.KEY)

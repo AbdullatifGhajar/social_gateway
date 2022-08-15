@@ -12,7 +12,12 @@ fun today(): String {
     return DateFormat.format("dd.MM.yyyy", Date()) as String
 }
 
-
+/**
+ * A singleton class that provides resources and logging functions
+ *
+ * Usage:
+ *  SocialGatewayApp.resources.getString(...)/getInt(...)
+ */
 class SocialGatewayApp : Application() {
     override fun onCreate() {
         super.onCreate()

@@ -66,6 +66,7 @@ class AppGridActivity : AppCompatActivity() {
         startActivity(packageManager.getLaunchIntentForPackage(socialApp.packageName))
     }
 
+    // when a user selects an app
     private fun chooseApp(socialApp: SocialApp) {
         if (!SocialGatewayApp.shouldReceivePrompt(socialApp)) {
             startApp(socialApp)
@@ -73,7 +74,7 @@ class AppGridActivity : AppCompatActivity() {
         }
 
         val prompt = when (SocialGatewayApp.isFirstTimeToday()) {
-            true -> Prompt("What is your goal for social media today?", true)
+            true -> Prompt(getString(R.string.first_prompt_of_the_day), true)
             else -> requestPrompt(socialApp)
         }
 
@@ -81,9 +82,7 @@ class AppGridActivity : AppCompatActivity() {
             startApp(socialApp)
         } else {
             AnswerDialog(this, socialApp, prompt,
-                onSubmit = {
-                    startApp(socialApp)
-                }, onCancel = { })
+                onSubmit = { startApp(socialApp) })
         }
         SocialGatewayApp.logPrompt(socialApp)
     }
@@ -141,12 +140,12 @@ class AppGridActivity : AppCompatActivity() {
                     AnswerDialog(this, null, prompt,
                         onSubmit = {
                             SocialGatewayApp.logReflectionPrompt()
-                        }, onCancel = { })
+                        })
                 }
                 IntentCategory.EMA -> {
                     EMADialog(this, onSubmit = {
                         SocialGatewayApp.logEMAPrompt()
-                    }, onCancel = { })
+                    })
                 }
                 IntentCategory.OpenApp -> {
                     chooseApp(

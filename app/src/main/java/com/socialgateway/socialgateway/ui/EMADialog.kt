@@ -1,18 +1,21 @@
 package com.socialgateway.socialgateway.ui
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
-import android.media.Rating
 import android.widget.*
 import com.socialgateway.socialgateway.ServerInterface
 import com.socialgateway.socialgateway.SocialGatewayApp
 import com.socialgateway.socialgateway.ui.AppGridActivity.Companion.userId
 import socialgateway.socialgateway.R
 
+/**
+ * the dialog that pops up to answer the EMA of the day
+ */
 class EMADialog(
     private val activity: Activity,
-    private val onSubmit: () -> Unit,
-    private val onCancel: () -> Unit
+    private val onSubmit: () -> Unit = {},
+    private val onCancel: () -> Unit = {}
 ) {
     private val layouts = listOf(
         activity.layoutInflater.inflate(R.layout.ema_dialog1, null),
@@ -25,21 +28,21 @@ class EMADialog(
         showDialog(0)
     }
 
-    private fun showDialog(index: Int) {
+    private fun showDialog(page: Int) {
         dialog = AlertDialog.Builder(activity, R.style.AlertDialogStyle).apply {
             setMessage("EMA of the day")
-            setView(layouts[index])
+            setView(layouts[page])
             setNegativeButton(android.R.string.cancel) { _, _ ->
                 onCancel()
             }
             setPositiveButton(android.R.string.ok) { _, _ ->
-                if (index + 1 == layouts.size) {
+                if (page + 1 == layouts.size) {
                     onSubmit()
                     answers().forEach { (question, answer) ->
                         ServerInterface.sendTextAnswer("ema", userId, question, answer)
                     }
                 } else {
-                    showDialog(index + 1)
+                    showDialog(page + 1)
                 }
             }
         }.create().apply {

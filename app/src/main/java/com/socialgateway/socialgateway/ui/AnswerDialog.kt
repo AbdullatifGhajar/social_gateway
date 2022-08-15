@@ -1,5 +1,6 @@
 package com.socialgateway.socialgateway.ui
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.view.ViewGroup
@@ -11,14 +12,16 @@ import com.socialgateway.socialgateway.data.model.SocialApp
 import com.socialgateway.socialgateway.ui.AppGridActivity.Companion.userId
 import socialgateway.socialgateway.R
 
+/**
+ * The answer dialog that pops up to display and react to a prompt
+ */
 class AnswerDialog(
     private val activity: Activity,
     private val socialApp: SocialApp?,
     private val prompt: Prompt,
-    private val onSubmit: () -> Unit,
-    private val onCancel: () -> Unit
+    private val onSubmit: () -> Unit = {},
+    private val onCancel: () -> Unit = {}
 ) {
-
     private val typingLayout = activity.layoutInflater.inflate(R.layout.typing_dialog, null)
     private val recordingLayout = activity.layoutInflater.inflate(R.layout.recording_dialog, null)
     private var recorder: VoiceRecorder? = null

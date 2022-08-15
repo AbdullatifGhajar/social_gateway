@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Specify meta settings -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="socialgateway.socialgateway">
 
+    <!-- Specify app permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
+    <!-- Specify app packages to be able to start other apps -->
     <queries>
         <package android:name="com.snapchat.android" />
         <package android:name="com.zhiliaoapp.musically" />
@@ -21,6 +24,7 @@
         <package android:name="org.thoughtcrime.securesms" />
     </queries>
 
+    <!-- Specify meta information and activities -->
     <application
         android:name="com.socialgateway.socialgateway.SocialGatewayApp"
         android:allowBackup="true"
@@ -46,9 +50,11 @@
             </intent-filter>
         </activity>
 
+        <!-- Specify receivers for notifications -->
         <receiver android:name="com.socialgateway.socialgateway.notifications.ReflectionNotification" />
         <receiver android:name="com.socialgateway.socialgateway.notifications.EMANotification" />
 
+        <!-- Specify notification service -->
         <service
             android:name="com.socialgateway.socialgateway.notifications.NotificationListener"
             android:exported="false"
