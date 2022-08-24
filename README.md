@@ -1,6 +1,7 @@
-# Locus (Social Gateway earlier)
+# Locus (Social Gateway)
 
-Every feature in the app, such as the time a certain action takes place, is customizable.
+This is just the way Locus was first used. Every feature in the app, such as the time a certain
+action takes place, is customizable.
 
 ## How it works
 
@@ -28,7 +29,7 @@ This list is stored in the app; changing it requires updating Locus.
 
 ### Prompts
 
-When a user opens an app through Locus, a prompt may appear. Users receive one prompt per day for each app. The prompt may be **answerable**, which means it is basically a question that you can answer. It can also be **unanswerable**, which is simply a tip for the day like *remember your goals for today*. These are stored on the server, so updating these prompts does not require updating the app in the Play Store. To learn more about prompts, see the server's documentation: github.com/AbdullatifGhajar/social_gateway_server
+When a user opens an app through Locus, a prompt may appear. Users receive one prompt per day for each app. The prompt may be **answerable**, which means it is basically a question that you can answer. It can also be **unanswerable**, which is simply a tip for the day like *remember your goals for today*. These are stored on the server, so updating these prompts does not require updating the app in the Play Store. To learn more about prompts, see the server's documentation: [Social Gateway Server](https://github.com/AbdullatifGhajar/social_gateway_server)
 
 The first prompt of the day is always the same and is as follows:
 
@@ -46,13 +47,13 @@ It appears at noon every day for 7 days. They are hard-coded in the app, since t
 
 ## Server
 
-In the backend, a Python server provides the list of prompts and reflection questions and collects all the users' answers from the app. This means that the prompts can be changed at any time without having to update Locus on the users' phones. In addition, the server authenticates registered users with an email and password combination. For more information, see the server's documentation:
-github.com/AbdullatifGhajar/social_gateway_server
+In the backend, a Python server provides the list of prompts and reflection questions and collects all the users' answers from the app. This means that the prompts can be changed at any time without having to update Locus on the users' phones. In addition, the server authenticates registered users with an email and password combination. For more information, see the server's documentation: [Social Gateway Server](https://github.com/AbdullatifGhajar/social_gateway_server)
+
 
 ## Download & Tutorial
 
-The app is available in the Google App Store for Android devices with an Android version above 7.0 (Nougat). Here is the link to the locus homepage, including a tutorial:
-hpi.com/baudisch/projects/neo4j/api/locus
+The app is available in the Google App Store for Android devices with an Android version above 7.0 (Nougat). Here is the link to the locus homepage, including a tutorial: [Locus](https://hpi.de/baudisch/projects/neo4j/api/locus)
+
 
 ## Privacy
 
