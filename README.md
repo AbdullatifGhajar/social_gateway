@@ -5,12 +5,7 @@ action takes place, is customizable.
 
 ## How it works
 
-Locus is a wrapper app for certain social media apps (see Supported Apps). This means that you can
-use it to open apps for social media. The main feature of Locus is the prompts (see Prompts), which
-are designed to help users reflect on their media consumption. In addition, Locus notifies users
-daily to answer a reflection question about their social media consumption and an EMA about their
-feelings. Users' responses are securely transmitted to a server (see Server), where they are
-collected for further analysis.
+Locus is a wrapper app for certain social media apps (see [Supported Apps](#supported-apps)). It means you can open social media apps directly through Locus. The main feature of Locus is the socalled prompts (see [Prompts](#prompts)), which are designed to help users reflect on their social media consumption. In addition, Locus notifies users daily to answer a reflection question about their social media consumption and an EMA about their feelings. Users' responses are securely transmitted to a server (see [Server](#server)), where they are collected for further analysis.
 
 ### Supported apps
 
@@ -28,40 +23,36 @@ collected for further analysis.
 - Telegram
 - Signal
 
+This list is stored in the app and changing it required updating Locus.
+
 ## Collected data
 
 ### Prompts
 
-When you open apps through Locus, a prompt may appear. Users receive one prompt per day for each
-app. The prompt may be a question that you can answer, or simply a tip for the day. These are stored
-on the server, so updating these prompts does not require updating the app in the Play Store. The
-first prompt of the day is always the same and is as follows:
+When a user opens an app through Locus, a prompt may appear. Users receive one prompt per day for each app. The prompt may be **answerable**, which means it is basically a question that you can answer. It can also be **unanswerable**, which is simply a tip for the day like *remember your goals for today*. These are stored on the server, so updating these prompts does not require updating the app in the Play Store. To learn more about prompts, see the server's documentation: github.com/AbdullatifGhajar/social_gateway_server
 
-- What is your goal for social media today?
+The first prompt of the day is always the same and is as follows:
+
+- *What is your goal for social media today?*
 
 ### Reflection questions
 
 In addition to the prompts, users receive a reflection question each evening (around 9 p.m.) that
-focuses on their consumption for the day. This asks, for example, whether the above prompts helped
-reduce social media consumption.
+extends the purpose of the prompts. This asks, for example, whether the above prompts helped reduce social media consumption. Reflection questions are also customisable and are stored on the server.
 
 ### EMAs
 
 EMAs are several questions that provide deeper insight into users' feelings and motivations.
-It appears at noon every day for 7 days.
+It appears at noon every day for 7 days. They are hard-coded on the app, since they don't change. If they have to change from time to time, moving them to the server might be beneficial.
 
 ## Server
 
-In the backend, a Python server collects all the users' answers. It also provides the list of
-prompts used in Locus. This means that the prompts can be changed at any time without having to
-update Locus on the users' phones. In addition, the server authenticates registered
-users with an email password combination. For more information, see the server's README:
+In the backend, a Python server provides the list of prompts and reflection questions and collects all the users' answers from the app. This means that the prompts can be changed at any time without having to update Locus on the users' phones. In addition, the server authenticates registered users with an email and password combination. For more information, see the server's documentation:
 github.com/AbdullatifGhajar/social_gateway_server
 
-## Download & Instructions
+## Download & Tutorial
 
-The app is available in the Google App Store for Android devices with an Android version above 7.0 (
-Nougat). Here is the link to the locus homepage, including a tutorial:
+The app is available in the Google App Store for Android devices with an Android version above 7.0 (Nougat). Here is the link to the locus homepage, including a tutorial:
 hpi.com/baudisch/projects/neo4j/api/locus
 
 ## Privacy
