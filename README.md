@@ -1,7 +1,6 @@
 # Locus (Social Gateway earlier)
 
-This is just the way Locus was first used. Every feature in the app, such as the time a certain
-action takes place, is customizable.
+Every feature in the app, such as the time a certain action takes place, is customizable.
 
 ## How it works
 
@@ -23,7 +22,7 @@ Locus is a wrapper app for certain social media apps (see [Supported Apps](#supp
 - Telegram
 - Signal
 
-This list is stored in the app and changing it required updating Locus.
+This list is stored in the app; changing it requires updating Locus.
 
 ## Collected data
 
@@ -43,7 +42,7 @@ extends the purpose of the prompts. This asks, for example, whether the above pr
 ### EMAs
 
 EMAs are several questions that provide deeper insight into users' feelings and motivations.
-It appears at noon every day for 7 days. They are hard-coded on the app, since they don't change. If they have to change from time to time, moving them to the server might be beneficial.
+It appears at noon every day for 7 days. They are hard-coded in the app, since they don't change. If they have to change from time to time, moving them to the server might be beneficial.
 
 ## Server
 
